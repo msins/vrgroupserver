@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="ehcache.xsd"
+         updateCheck="false">
+
+    <diskStore path="java.io.tmpdir/ehcache"/>
+
+    <defaultCache maxElementsInMemory="100"
+                  timeToIdleSeconds="120" timeToLiveSeconds="120" diskSpoolBufferSizeMB="30"
+                  maxElementsOnDisk="1000" diskExpiryThreadIntervalSeconds="120"
+                  memoryStoreEvictionPolicy="LRU" statistics="true"/>
+
+    <cache name="org.hibernate.cache.internal.StandardQueryCache"
+           maxElementsInMemory="5" timeToLiveSeconds="120"
+           overflowToDisk="true"/>
+
+    <cache name="edu.vrgroup.model.Question"
+           maxElementsInMemory="10"
+           timeToIdleSeconds="120" timeToLiveSeconds="120" diskSpoolBufferSizeMB="30"
+           maxElementsOnDisk="1000" diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="LRU" statistics="true"/>
+
+</ehcache>
