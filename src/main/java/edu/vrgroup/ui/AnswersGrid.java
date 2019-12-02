@@ -4,7 +4,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import edu.vrgroup.model.Answer;
 
-public class AnswersView extends Grid<Answer> {
+public class AnswersGrid extends Grid<Answer> {
 
   {
     initStyle();

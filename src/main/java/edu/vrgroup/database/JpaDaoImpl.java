@@ -3,10 +3,15 @@ package edu.vrgroup.database;
 import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
+import edu.vrgroup.model.GameQuestion;
 import edu.vrgroup.model.Question;
+import edu.vrgroup.model.Scenario;
 import edu.vrgroup.questions.MultipleChoicesQuestion;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 public class JpaDaoImpl implements Dao {
 
@@ -19,6 +24,16 @@ public class JpaDaoImpl implements Dao {
         .setParameter("gameId", game.getId())
         .getResultList();
     return results;
+  }
+
+  @Override
+  public void addQuestion(Game game, Question question) {
+    getEntityManager().persist(question);
+    for(var choice : question.getChoices()){
+      getEntityManager().persist(choice);
+    }
+    getEntityManager().persist(new GameQuestion(game, question));
+    getEntityManager().getTransaction().commit();
   }
 
   @Override
@@ -117,6 +132,43 @@ public class JpaDaoImpl implements Dao {
         .getResultList();
 
     return results;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Answer> getAnswers(Game game, Scenario scenario, Question question, int offset, int limit) {
+    List<Answer> results = (List<Answer>) getEntityManager()
+        .createQuery(
+            "select answer from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId")
+        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
+        .setParameter("questionId", question.getId())
+        .getResultList();
+    return results;
+  }
+
+  @Override
+  public int getAnswersCount(Game game, Scenario scenario, Question question) {
+    return ((Long) getEntityManager()
+        .createQuery(
+            "select count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId")
+        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
+        .setParameter("questionId", question.getId())
+        .getSingleResult()).intValue();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<Choice, Integer> getQuestionStatistics(Game game, Scenario scenario, Question question) {
+    Object a = getEntityManager()
+        .createQuery(
+            "select score, count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId group by score")
+        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
+        .setParameter("questionId", question.getId())
+        .getSingleResult();
+    return null;
   }
 
   private EntityManager getEntityManager() {

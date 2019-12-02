@@ -1,12 +1,13 @@
 package edu.vrgroup.model;
 
-import com.google.common.base.MoreObjects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
 public class Scenario {
+
+  public static Scenario DEFAULT = new Scenario("Default");
 
   @Id
   private Integer id;

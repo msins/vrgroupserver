@@ -7,7 +7,7 @@ public interface GameChangeListener {
 
   void gameChanged(Game game);
 
-  default void registerToNotifier() {
+  default void registerToGameNotifier() {
     GameChangeNotifier notifier = (GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier");
     if (notifier == null) {
       notifier = new GameChangeNotifier();

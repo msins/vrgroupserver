@@ -13,13 +13,13 @@ import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import edu.vrgroup.Answers;
 import edu.vrgroup.model.Answer;
+import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Question;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class ResultChart<T extends Question> extends Chart {
 
-  private ListSeries statistics;
   private T question;
 
   public ResultChart(T question) {
@@ -31,24 +31,10 @@ public class ResultChart<T extends Question> extends Chart {
   private void initChar() {
     Configuration conf = getConfiguration();
 
-    DataProviderSeries<Answer> s = new DataProviderSeries<>(
-        new AbstractBackEndDataProvider<Answer, Object>() {
-          @Override
-          protected Stream<Answer> fetchFromBackEnd(Query<Answer, Object> query) {
-            return null;
-          }
-
-          @Override
-          protected int sizeInBackEnd(Query<Answer, Object> query) {
-            return 0;
-          }
-        }
-    );
-
     //x axis
     XAxis x = new XAxis();
     x.setType(AxisType.CATEGORY);
-    x.setCategories(question.getChoices());
+    x.setCategories(question.getChoices().stream().map(Choice::getText).toArray(String[]::new));
     x.setTickLength(0);
     conf.addxAxis(x);
 
@@ -70,7 +56,19 @@ public class ResultChart<T extends Question> extends Chart {
         "return this.y.toFixed(1) + '%';" +
         "}");
     conf.setTooltip(tooltip);
+    setEmptySeries();
+  }
 
-    conf.setSeries(statistics);
+  public void update(ListSeries series) {
+    getConfiguration().setSeries(series);
+  }
+
+  public T getQuestion() {
+    return question;
+  }
+
+  private void setEmptySeries() {
+    Number[] nums = new Number[question.getChoices().size()];
+    getConfiguration().setSeries(new ListSeries(nums));
   }
 }

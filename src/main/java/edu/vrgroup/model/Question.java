@@ -1,5 +1,6 @@
 package edu.vrgroup.model;
 
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,6 +23,15 @@ public abstract class Question {
   @Column
   protected Integer type;
 
+  public Question() {
+  }
+
+  public Question(String text, Type type) {
+    this.text = text;
+    this.type = type.intValue();
+    this.id = text.hashCode();
+  }
+
   public Integer getId() {
     return id;
   }
@@ -33,7 +43,7 @@ public abstract class Question {
   /**
    * Used to render answers in dashboard
    */
-  public abstract String[] getChoices();
+  public abstract List<Choice> getChoices();
 
   public enum Type {
     MULTIPLE_CHOICES(1, "Multiple choices"),
@@ -47,7 +57,7 @@ public abstract class Question {
       this.name = name;
     }
 
-    public int getType() {
+    public int intValue() {
       return type;
     }
 

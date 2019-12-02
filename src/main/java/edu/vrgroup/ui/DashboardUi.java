@@ -7,9 +7,7 @@ import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinSession;
 import edu.vrgroup.GameChangeListener;
-import edu.vrgroup.GameChangeNotifier;
 import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Game;
@@ -22,42 +20,35 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener {
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
-    registerToNotifier();
+    registerToGameNotifier();
   }
 
-  AnswersView grid = new AnswersView();
+  AnswersGrid grid = new AnswersGrid();
   Game game;
 
   public DashboardUi() {
     grid.setMultiSort(true);
     grid.setDataProvider(new AnswersProvider(game));
 
-    grid.addColumn(
-        a -> a.getTimestamp().toLocalDateTime()
-            .format(DateTimeFormatter.ofPattern("d. MMMM yyyy. HH:mm:ss")))
-        .setFlexGrow(1)
-        .setHeader(new Html("<b>Timestamp</b>"))
-        .setSortable(true);
+    grid.addColumn(a -> a.getTimestamp().toLocalDateTime()
+        .format(DateTimeFormatter.ofPattern("d. MMMM yyyy. HH:mm:ss")))
+        .setHeader(new Html("<b>Time</b>"));
     grid.addColumn(a -> a.getUser().getName())
-        .setSortable(true)
-        .setHeader(new Html("<b>Name</b>"));
+        .setHeader(new Html("<b>User</b>"));
     grid.addColumn(Answer::getIPv4)
-        .setSortable(true)
         .setHeader(new Html("<b>IPv4</b>"));
     grid.addColumn(Answer::getGame)
         .setKey("game")
-        .setSortable(true)
         .setHeader(new Html("<b>Game</b>"));
     grid.addColumn(Answer::getScenario)
-        .setSortable(true)
         .setHeader(new Html("<b>Scenario</b>"));
     grid.addColumn(a -> a.getQuestion().getText())
-        .setSortable(true)
         .setHeader(new Html("<b>Question</b>"));
-    grid.addColumn(a -> a.getQuestion().getChoices()[a.getScore() - 1])
-        .setSortable(true)
+    grid.addColumn(a -> a.getQuestion().getChoices().get(a.getScore() - 1))
         .setHeader(new Html("<b>Score</b>"));
 
+    grid.getColumns().forEach(e -> e.setAutoWidth(true));
+    grid.getColumns().forEach(e -> e.setSortable(true));
     add(grid);
   }
 

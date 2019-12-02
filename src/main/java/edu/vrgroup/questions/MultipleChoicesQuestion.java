@@ -3,7 +3,6 @@ package edu.vrgroup.questions;
 import com.google.common.base.MoreObjects;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Question;
-import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.database.JpaEntityManagerFactoryProvider;
 import java.util.List;
 import javax.persistence.Entity;
@@ -21,6 +20,10 @@ public class MultipleChoicesQuestion extends Question {
   @JoinColumn(name = "questionId")
   private List<Choice> choices;
 
+  public MultipleChoicesQuestion(String text) {
+    super(text, Type.MULTIPLE_CHOICES);
+  }
+
   public MultipleChoicesQuestion() {
   }
 
@@ -35,8 +38,12 @@ public class MultipleChoicesQuestion extends Question {
   }
 
   @Override
-  public String[] getChoices() {
-    return choices.stream().map(Choice::getText).toArray(String[]::new);
+  public List<Choice> getChoices() {
+    return choices;
+  }
+
+  public void setChoices(List<Choice> choices) {
+    this.choices = choices;
   }
 
   @Override

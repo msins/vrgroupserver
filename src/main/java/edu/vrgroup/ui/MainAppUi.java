@@ -26,7 +26,6 @@ import edu.vrgroup.GameChangeNotifier;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.util.SecurityUtils;
-import java.util.List;
 import java.util.stream.Stream;
 
 @Route("")
@@ -90,7 +89,7 @@ public class MainAppUi extends AppLayout {
 
   private static Select<Game> createGamesList() {
     Select<Game> games = new Select<>();
-    games.setPlaceholder("Pick a game");
+    games.setPlaceholder("Select a game");
     games.setDataProvider(new AbstractBackEndDataProvider<>() {
       @Override
       protected Stream<Game> fetchFromBackEnd(Query<Game, Object> query) {

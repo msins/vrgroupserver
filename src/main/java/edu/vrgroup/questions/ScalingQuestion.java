@@ -1,7 +1,9 @@
 package edu.vrgroup.questions;
 
 import com.google.common.base.MoreObjects;
+import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Question;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.PrimaryKeyJoinColumn;
 
@@ -19,7 +21,7 @@ public class ScalingQuestion extends Question {
   }
 
   @Override
-  public String[] getChoices() {
-    return new String[0];
+  public List<Choice> getChoices() {
+    return null;
   }
 }

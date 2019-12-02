@@ -6,7 +6,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-@Entity
+@Entity(name = "GameQuestion")
 public class GameQuestion implements Serializable {
 
   @Id
@@ -18,6 +18,11 @@ public class GameQuestion implements Serializable {
   @ManyToOne
   @JoinColumn(name = "questionId")
   private Question question;
+
+  public GameQuestion(Game game, Question question) {
+    this.game = game;
+    this.question = question;
+  }
 
   public GameQuestion() {
   }
