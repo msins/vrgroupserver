@@ -1,5 +1,6 @@
 package edu.vrgroup.model;
 
+import com.google.gson.annotations.Expose;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,9 +11,11 @@ public class Scenario {
   public static Scenario DEFAULT = new Scenario("Default");
 
   @Id
+  @Expose
   private Integer id;
 
   @Column
+  @Expose
   private String name;
 
   public Scenario() {

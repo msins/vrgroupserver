@@ -1,5 +1,6 @@
 package edu.vrgroup.model;
 
+import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,27 +17,28 @@ public class Choice implements Serializable {
 
   @Id
   @Column(name = "text")
-  private String text;
+  @Expose
+  private String value;
 
   public Choice() {
 
   }
 
-  public Choice(Integer questionId, String text) {
+  public Choice(Integer questionId, String value) {
     this.questionId = questionId;
-    this.text = text;
+    this.value = value;
   }
 
   public Integer getQuestionId() {
     return questionId;
   }
 
-  public String getText() {
-    return text;
+  public String getValue() {
+    return value;
   }
 
   @Override
   public String toString() {
-    return text;
+    return value;
   }
 }

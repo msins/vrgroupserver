@@ -1,5 +1,6 @@
 package edu.vrgroup.model;
 
+import com.google.gson.annotations.Expose;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,9 +16,11 @@ public abstract class Question {
 
   @Id
   @Column(name = "id")
+  @Expose
   protected Integer id;
 
   @Column
+  @Expose
   protected String text;
 
   @Column

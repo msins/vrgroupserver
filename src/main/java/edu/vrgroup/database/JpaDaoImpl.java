@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
 
 public class JpaDaoImpl implements Dao {
@@ -29,7 +30,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   public void addQuestion(Game game, Question question) {
     getEntityManager().persist(question);
-    for(var choice : question.getChoices()){
+    for (var choice : question.getChoices()) {
       getEntityManager().persist(choice);
     }
     getEntityManager().persist(new GameQuestion(game, question));
@@ -76,6 +77,12 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
+  public boolean containsGame(Game game) {
+    return ((Long) getEntityManager().createQuery("select count(game.id) from Game as game where game.id = :gameId")
+        .setParameter("gameId", game.getId()).getSingleResult()) != 0;
+  }
+
+  @Override
   public void addGame(Game game) {
     getEntityManager().persist(game);
     getEntityManager().getTransaction().commit();
@@ -85,7 +92,7 @@ public class JpaDaoImpl implements Dao {
   public void removeGame(Game game) {
     EntityManager em = getEntityManager();
     em.remove(em.contains(game) ? game : em.merge(game));
-    em.flush();
+    em.getTransaction().commit();
   }
 
   @Override

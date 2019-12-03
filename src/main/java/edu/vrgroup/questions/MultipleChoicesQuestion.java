@@ -1,6 +1,7 @@
 package edu.vrgroup.questions;
 
 import com.google.common.base.MoreObjects;
+import com.google.gson.annotations.Expose;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.database.JpaEntityManagerFactoryProvider;
@@ -18,6 +19,7 @@ public class MultipleChoicesQuestion extends Question {
 
   @OneToMany
   @JoinColumn(name = "questionId")
+  @Expose
   private List<Choice> choices;
 
   public MultipleChoicesQuestion(String text) {

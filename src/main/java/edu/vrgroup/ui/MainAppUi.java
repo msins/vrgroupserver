@@ -6,6 +6,7 @@ import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.page.Push;
@@ -38,7 +39,6 @@ public class MainAppUi extends AppLayout {
 
   public MainAppUi() {
     gameSelect.addValueChangeListener(e -> {
-      System.out.println("Value change" + e.getValue());
       Game game = e.getValue();
       if (game != null) {
         ((GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier")).setGame(game);
@@ -46,6 +46,7 @@ public class MainAppUi extends AppLayout {
     });
     addToNavbar(true, createNewGameButton(gameSelect));
     addToNavbar(true, gameSelect);
+    addToNavbar(true, createRemoveGameButton(gameSelect));
     addToNavbar(true, createMenuLayout());
     addToNavbar(true, createLogOutButton());
   }
@@ -74,6 +75,19 @@ public class MainAppUi extends AppLayout {
     Button newGame = new Button(VaadinIcon.PLUS.create(), e -> new NewGameForm(select).open());
     newGame.getStyle().set("border-radius", "50%");
     return newGame;
+  }
+
+  private static Button createRemoveGameButton(Select<Game> select) {
+    Button removeGame = new Button(VaadinIcon.MINUS.create(), e -> {
+
+      if (select.getValue() != null) {
+        DaoProvider.getDao().removeGame(select.getValue());
+        select.getDataProvider().refreshAll();
+      }
+    });
+    removeGame.getStyle().set("border-radius", "50%");
+    removeGame.getStyle().set("color", "red");
+    return removeGame;
   }
 
   private static Button createLogOutButton() {

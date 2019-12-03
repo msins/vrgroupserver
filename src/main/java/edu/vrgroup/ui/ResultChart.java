@@ -4,19 +4,12 @@ import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.AxisType;
 import com.vaadin.flow.component.charts.model.ChartType;
 import com.vaadin.flow.component.charts.model.Configuration;
-import com.vaadin.flow.component.charts.model.DataProviderSeries;
 import com.vaadin.flow.component.charts.model.ListSeries;
 import com.vaadin.flow.component.charts.model.Tooltip;
 import com.vaadin.flow.component.charts.model.XAxis;
 import com.vaadin.flow.component.charts.model.YAxis;
-import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
-import com.vaadin.flow.data.provider.Query;
-import edu.vrgroup.Answers;
-import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Question;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 public class ResultChart<T extends Question> extends Chart {
 
@@ -34,7 +27,7 @@ public class ResultChart<T extends Question> extends Chart {
     //x axis
     XAxis x = new XAxis();
     x.setType(AxisType.CATEGORY);
-    x.setCategories(question.getChoices().stream().map(Choice::getText).toArray(String[]::new));
+    x.setCategories(question.getChoices().stream().map(Choice::getValue).toArray(String[]::new));
     x.setTickLength(0);
     conf.addxAxis(x);
 

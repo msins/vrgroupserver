@@ -23,6 +23,8 @@ public interface Dao {
 
   List<Game> getGames();
 
+  boolean containsGame(Game game);
+
   void addGame(Game game);
 
   void removeGame(Game game);
