@@ -1,12 +1,12 @@
 package edu.vrgroup;
 
 import edu.vrgroup.model.Game;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class GameChangeNotifier {
 
-  private List<GameChangeListener> listeners = new CopyOnWriteArrayList<>();
+  private Set<GameChangeListener> listeners = new CopyOnWriteArraySet<>();
   private Game game;
 
   public void registerListener(GameChangeListener listener) {

@@ -23,6 +23,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.communication.PushMode;
+import edu.vrgroup.GameChangeListener;
 import edu.vrgroup.GameChangeNotifier;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.database.DaoProvider;
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @Push(PushMode.AUTOMATIC)
 @PWA(name = "Administrator dashboard", shortName = "Dashboard")
-public class MainAppUi extends AppLayout {
+public class MainAppUi extends AppLayout implements GameChangeListener {
 
   Select<Game> gameSelect = createGamesList();
 
@@ -142,10 +143,19 @@ public class MainAppUi extends AppLayout {
     }
 
     //return current game on refresh
-    Game game = ((GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier")).getGame();
+    registerToGameNotifier();
+    Game game = null;
+    Object notifier = VaadinSession.getCurrent().getAttribute("game.notifier");
+    if (notifier != null) {
+      game = ((GameChangeNotifier) notifier).getGame();
+    }
     if (game != null) {
       gameSelect.setValue(game);
     }
-    System.out.println("attach to main " + attachEvent.getSession());
+  }
+
+  @Override
+  public void gameChanged(Game game) {
+    //do nothing for now
   }
 }
