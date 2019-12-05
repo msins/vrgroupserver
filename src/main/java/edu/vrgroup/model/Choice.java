@@ -4,16 +4,20 @@ import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity(name = "Choice")
 public class Choice implements Serializable {
 
   @Id
-  @Column(name = "questionId")
-  @JoinColumn(name = "questionId")
-  private Integer questionId;
+  @ManyToOne
+  @JoinColumn(name = "questionId", nullable = false, foreignKey = @ForeignKey(
+      foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES MultipleChoicesQuestion(questionId) ON DELETE CASCADE"
+  ))
+  private Question question;
 
   @Id
   @Column(name = "text")
@@ -24,13 +28,13 @@ public class Choice implements Serializable {
 
   }
 
-  public Choice(Integer questionId, String value) {
-    this.questionId = questionId;
+  public Choice(Question question, String value) {
+    this.question = question;
     this.value = value;
   }
 
-  public Integer getQuestionId() {
-    return questionId;
+  public Question getQuestion() {
+    return question;
   }
 
   public String getValue() {

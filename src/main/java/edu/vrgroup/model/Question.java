@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "Question")
@@ -16,6 +18,7 @@ public abstract class Question {
 
   @Id
   @Column(name = "id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @Expose
   protected Integer id;
 

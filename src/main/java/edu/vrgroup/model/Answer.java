@@ -1,31 +1,17 @@
 package edu.vrgroup.model;
 
 import com.google.common.base.MoreObjects;
-import edu.vrgroup.database.DaoProvider;
-import edu.vrgroup.database.JpaEntityManagerFactoryProvider;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EntityManagerFactory;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Persistence;
 
 @Entity
 public class Answer<T extends Question> implements Serializable {
-
-  public static void main(String[] args) {
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("vr.server.db");
-    JpaEntityManagerFactoryProvider.setEmf(emf);
-    System.out.println(DaoProvider.getDao().getAnswers(0, 100));
-    System.out.println(DaoProvider.getDao().getAnswersCount());
-    JpaEntityManagerFactoryProvider.setEmf(null);
-    if (emf != null) {
-      emf.close();
-    }
-  }
 
   @Id
   @Column(name = "timestampCreated")
@@ -33,22 +19,30 @@ public class Answer<T extends Question> implements Serializable {
 
   @Id
   @ManyToOne(targetEntity = Question.class)
-  @JoinColumn(name = "questionId")
+  @JoinColumn(name = "questionId", nullable = false, foreignKey = @ForeignKey(
+      foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES Question(id) ON DELETE CASCADE"
+  ))
   private T question;
 
   @Id
   @ManyToOne(targetEntity = Scenario.class)
-  @JoinColumn(name = "scenarioId")
+  @JoinColumn(name = "scenarioId", nullable = false, foreignKey = @ForeignKey(
+      foreignKeyDefinition = "FOREIGN KEY (scenarioId) REFERENCES Scenario(id) ON DELETE CASCADE"
+  ))
   private Scenario scenario;
 
   @Id
   @ManyToOne
-  @JoinColumn(name = "gameId")
+  @JoinColumn(name = "gameId", nullable = false, foreignKey = @ForeignKey(
+      foreignKeyDefinition = "FOREIGN KEY (gameId) REFERENCES Game(id) ON DELETE CASCADE"
+  ))
   private Game game;
 
   @Id
   @ManyToOne
-  @JoinColumn(name = "userId")
+  @JoinColumn(name = "userId", nullable = false, foreignKey = @ForeignKey(
+      foreignKeyDefinition = "FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE"
+  ))
   private User user;
 
   @Column
