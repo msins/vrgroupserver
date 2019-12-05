@@ -15,6 +15,8 @@ public interface Dao {
 
   void addQuestion(Game game, Question question);
 
+  void removeQuestion(Game game, Question question);
+
   int getQuestionsCount(Game game);
 
   List<Choice> getChoices(MultipleChoicesQuestion question);

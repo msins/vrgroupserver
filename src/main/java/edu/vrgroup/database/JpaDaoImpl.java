@@ -34,7 +34,15 @@ public class JpaDaoImpl implements Dao {
     JpaEntityManagerProvider.close();
   }
 
-  
+  @Override
+  public void removeQuestion(Game game, Question question) {
+    EntityManager em = JpaEntityManagerProvider.getEntityManager();
+    em.createQuery("delete from Question as q where q.id = :questionId")
+    .setParameter("questionId",question.getId()).executeUpdate();
+    JpaEntityManagerProvider.close();
+    JpaEntityManagerProvider.getEntityManager().clear();
+  }
+
   @Override
   public int getQuestionsCount(Game game) {
     return ((Long) JpaEntityManagerProvider.getEntityManager()
@@ -48,7 +56,7 @@ public class JpaDaoImpl implements Dao {
   @SuppressWarnings("unchecked")
   public List<Choice> getChoices(MultipleChoicesQuestion question) {
     List<Choice> results = (List<Choice>) JpaEntityManagerProvider.getEntityManager()
-        .createQuery("select choice from Choice as choice where choice.questionId = :questionId")
+        .createQuery("select choice from Choice as choice where choice.question.id = :questionId")
         .setParameter("questionId", question.getId())
         .setMaxResults(50)
         .getResultList();
@@ -76,7 +84,8 @@ public class JpaDaoImpl implements Dao {
 
   @Override
   public boolean containsGame(Game game) {
-    return ((Long) JpaEntityManagerProvider.getEntityManager().createQuery("select count(game.id) from Game as game where game.id = :gameId")
+    return ((Long) JpaEntityManagerProvider.getEntityManager()
+        .createQuery("select count(game.id) from Game as game where game.id = :gameId")
         .setParameter("gameId", game.getId()).getSingleResult()) != 0;
   }
 
