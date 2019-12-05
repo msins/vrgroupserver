@@ -13,6 +13,7 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.ui.util.ButtonFactory;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -67,6 +68,12 @@ public class NewQuestionForm extends Dialog {
             }
           }
 
+          List<TextField> duplicates = fields.stream().filter(i -> Collections.frequency(fields, i) > 1)
+              .collect(Collectors.toList());
+          if (duplicates.size() != 0) {
+            hasError = true;
+            duplicates.forEach(d -> d.setInvalid(true));
+          }
           if (!hasError) {
             String[] values = f.getChoicesValues();
             MultipleChoicesQuestion newQuestion = new MultipleChoicesQuestion(f.getText().getValue());

@@ -10,16 +10,13 @@ import edu.vrgroup.questions.MultipleChoicesQuestion;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
-import javax.persistence.Persistence;
 
 public class JpaDaoImpl implements Dao {
 
   @Override
   @SuppressWarnings("unchecked")
   public List<Question> getQuestions(Game game) {
-    List<Question> results = (List<Question>) getEntityManager()
+    List<Question> results = (List<Question>) JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select q from Question as q, GameQuestion as gq where q.id = gq.question.id and gq.game.id = :gameId")
         .setParameter("gameId", game.getId())
@@ -29,17 +26,18 @@ public class JpaDaoImpl implements Dao {
 
   @Override
   public void addQuestion(Game game, Question question) {
-    getEntityManager().persist(question);
+    JpaEntityManagerProvider.getEntityManager().persist(question);
     for (var choice : question.getChoices()) {
-      getEntityManager().persist(choice);
+      JpaEntityManagerProvider.getEntityManager().persist(choice);
     }
-    getEntityManager().persist(new GameQuestion(game, question));
-    getEntityManager().getTransaction().commit();
+    JpaEntityManagerProvider.getEntityManager().persist(new GameQuestion(game, question));
+    JpaEntityManagerProvider.close();
   }
 
+  
   @Override
   public int getQuestionsCount(Game game) {
-    return ((Long) getEntityManager()
+    return ((Long) JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select count(*) from Question as q, GameQuestion as gq where q.id = gq.question.id and gq.game.id = :gameId")
         .setParameter("gameId", game.getId())
@@ -49,7 +47,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   @SuppressWarnings("unchecked")
   public List<Choice> getChoices(MultipleChoicesQuestion question) {
-    List<Choice> results = (List<Choice>) getEntityManager()
+    List<Choice> results = (List<Choice>) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select choice from Choice as choice where choice.questionId = :questionId")
         .setParameter("questionId", question.getId())
         .setMaxResults(50)
@@ -60,7 +58,7 @@ public class JpaDaoImpl implements Dao {
 
   @Override
   public int getGamesCount() {
-    return ((Long) getEntityManager()
+    return ((Long) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select count(*) from Game")
         .getSingleResult()).intValue();
   }
@@ -68,7 +66,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   @SuppressWarnings("unchecked")
   public List<Game> getGames() {
-    List<Game> results = (List<Game>) getEntityManager()
+    List<Game> results = (List<Game>) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select game from Game as game")
         .setMaxResults(50)
         .getResultList();
@@ -78,26 +76,26 @@ public class JpaDaoImpl implements Dao {
 
   @Override
   public boolean containsGame(Game game) {
-    return ((Long) getEntityManager().createQuery("select count(game.id) from Game as game where game.id = :gameId")
+    return ((Long) JpaEntityManagerProvider.getEntityManager().createQuery("select count(game.id) from Game as game where game.id = :gameId")
         .setParameter("gameId", game.getId()).getSingleResult()) != 0;
   }
 
   @Override
   public void addGame(Game game) {
-    getEntityManager().persist(game);
-    getEntityManager().getTransaction().commit();
+    JpaEntityManagerProvider.getEntityManager().persist(game);
+    JpaEntityManagerProvider.close();
   }
 
   @Override
   public void removeGame(Game game) {
-    EntityManager em = getEntityManager();
+    EntityManager em = JpaEntityManagerProvider.getEntityManager();
     em.remove(em.contains(game) ? game : em.merge(game));
-    em.getTransaction().commit();
+    JpaEntityManagerProvider.close();
   }
 
   @Override
   public int getAnswersCount() {
-    return ((Long) getEntityManager()
+    return ((Long) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select count(*) from Answer")
         .getSingleResult()).intValue();
   }
@@ -105,7 +103,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   @SuppressWarnings("unchecked")
   public List<Answer> getAnswers(int offset, int limit) {
-    List<Answer> results = (List<Answer>) getEntityManager()
+    List<Answer> results = (List<Answer>) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select answer from Answer as answer")
         .setFirstResult(offset)
         .setMaxResults(limit)
@@ -119,7 +117,7 @@ public class JpaDaoImpl implements Dao {
     if (game == null) {
       return getAnswersCount();
     }
-    return ((Long) getEntityManager()
+    return ((Long) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select count(*) from Answer as answer where answer.game.id = :gameId")
         .setParameter("gameId", game.getId())
         .getSingleResult()).intValue();
@@ -131,7 +129,7 @@ public class JpaDaoImpl implements Dao {
     if (game == null) {
       return getAnswers(offset, limit);
     }
-    List<Answer> results = (List<Answer>) getEntityManager()
+    List<Answer> results = (List<Answer>) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select answer from Answer as answer where answer.game.id = :gameId")
         .setParameter("gameId", game.getId())
         .setFirstResult(offset)
@@ -144,7 +142,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   @SuppressWarnings("unchecked")
   public List<Answer> getAnswers(Game game, Scenario scenario, Question question, int offset, int limit) {
-    List<Answer> results = (List<Answer>) getEntityManager()
+    List<Answer> results = (List<Answer>) JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select answer from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId")
         .setParameter("gameId", game.getId())
@@ -156,7 +154,7 @@ public class JpaDaoImpl implements Dao {
 
   @Override
   public int getAnswersCount(Game game, Scenario scenario, Question question) {
-    return ((Long) getEntityManager()
+    return ((Long) JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId")
         .setParameter("gameId", game.getId())
@@ -168,7 +166,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   @SuppressWarnings("unchecked")
   public Map<Choice, Integer> getQuestionStatistics(Game game, Scenario scenario, Question question) {
-    Object a = getEntityManager()
+    Object a = JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select score, count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId group by score")
         .setParameter("gameId", game.getId())
@@ -178,7 +176,4 @@ public class JpaDaoImpl implements Dao {
     return null;
   }
 
-  private EntityManager getEntityManager() {
-    return JpaEntityManagerProvider.getEntityManager();
-  }
 }

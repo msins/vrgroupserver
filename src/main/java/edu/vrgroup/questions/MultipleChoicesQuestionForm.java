@@ -15,7 +15,15 @@ public class MultipleChoicesQuestionForm extends VerticalLayout {
 
   public MultipleChoicesQuestionForm() {
     Button newChoice = new Button(VaadinIcon.PLUS.create(), e -> {
-      TextField field = new TextField("", String.valueOf(choices.getFields().size() + 1));
+      TextField field = new TextField("", String.valueOf(choices.getFields().size() + 1)) {
+        @Override
+        public boolean equals(Object obj) {
+          if (!(obj instanceof TextField)) {
+            return false;
+          }
+          return this.getValue().equalsIgnoreCase(((TextField) obj).getValue());
+        }
+      };
       field.setWidthFull();
       choices.add(field);
     });
