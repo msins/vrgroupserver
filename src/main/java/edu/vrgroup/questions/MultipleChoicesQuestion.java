@@ -4,13 +4,10 @@ import com.google.common.base.MoreObjects;
 import com.google.gson.annotations.Expose;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Question;
-import edu.vrgroup.database.JpaEntityManagerFactoryProvider;
 import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.Persistence;
 import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity(name = "MultipleChoicesQuestion")
@@ -27,16 +24,6 @@ public class MultipleChoicesQuestion extends Question {
   }
 
   public MultipleChoicesQuestion() {
-  }
-
-  public static void main(String[] args) {
-    EntityManagerFactory emf = Persistence.createEntityManagerFactory("vr.server.db");
-    JpaEntityManagerFactoryProvider.setEmf(emf);
-
-    JpaEntityManagerFactoryProvider.setEmf(null);
-    if (emf != null) {
-      emf.close();
-    }
   }
 
   @Override

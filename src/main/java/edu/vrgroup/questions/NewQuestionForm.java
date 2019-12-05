@@ -48,6 +48,8 @@ public class NewQuestionForm extends Dialog {
         notification.open();
         return;
       }
+
+      //todo add other question types?
       switch (select.getValue()) {
         case MULTIPLE_CHOICES:
           MultipleChoicesQuestionForm f = ((MultipleChoicesQuestionForm) form);
@@ -78,7 +80,7 @@ public class NewQuestionForm extends Dialog {
             String[] values = f.getChoicesValues();
             MultipleChoicesQuestion newQuestion = new MultipleChoicesQuestion(f.getText().getValue());
             List<Choice> choices = Arrays.stream(values)
-                .map(value -> new Choice(newQuestion.getId(), value))
+                .map(value -> new Choice(newQuestion, value))
                 .collect(Collectors.toList());
             newQuestion.setChoices(choices);
             DaoProvider.getDao().addQuestion(game, newQuestion);

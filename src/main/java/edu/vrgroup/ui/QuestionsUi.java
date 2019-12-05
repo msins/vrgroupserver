@@ -7,7 +7,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
@@ -24,6 +26,7 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.questions.NewQuestionForm;
+import edu.vrgroup.ui.util.ButtonFactory;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -49,7 +52,10 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
     questions.addValueChangeListener(e -> {
       QuestionView old = questionInformation;
       if (e.getValue() != null) {
-        questionInformation = new QuestionView(game, scenarioNotifier.getScenario(), e.getValue());
+        questionInformation = new QuestionView(game,
+            scenarioNotifier.getScenario(),
+            e.getValue(),
+            questions.getDataProvider());
       }
 
       replace(old, questionInformation);
@@ -127,7 +133,6 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       setHeightFull();
       setRenderer(new TextRenderer<>(Question::getText));
       setWidthFull();
-
     }
 
     public Questions() {
@@ -141,11 +146,13 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
     private Game game;
     private Scenario scenario;
     private Question question;
+    private DataProvider<Question, ?> notifier;
 
-    public QuestionView(Game game, Scenario scenario, Question question) {
+    public QuestionView(Game game, Scenario scenario, Question question, DataProvider<Question, ?> notifier) {
       this.game = game;
       this.scenario = scenario;
       this.question = question;
+      this.notifier = notifier;
       initUi();
     }
 
@@ -195,40 +202,29 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
         System.err.println(DaoProvider.getDao().getQuestionStatistics(game, scenario, question));
 
       }));
-      add(new HorizontalLayout(grid, chart) {{
-        setWidthFull();
-      }});
+      VerticalLayout layout = new VerticalLayout();
+      layout.setAlignItems(Alignment.CENTER);
+      HorizontalLayout gridChart = new HorizontalLayout(grid, chart);
+      gridChart.setWidthFull();
+      layout.add(gridChart);
 
+      TextArea text = new TextArea("Text");
+      text.setValue(question.getText());
+      text.setWidthFull();
+      layout.add(text);
 
+      Button delete = ButtonFactory.createRedButton("Delete", e -> {
+        DaoProvider.getDao().removeQuestion(game, question);
+        removeAll();
+        notifier.refreshAll();
+      });
+      Button sync = ButtonFactory.createGreenButton("Sync", e -> {
+        DaoProvider.getDao().removeQuestion(game, question);
+      });
+
+      layout.add(new HorizontalLayout(delete, sync));
+      add(layout);
     }
-//      text = new TextArea("Text", results.getQuestion().getText(), e -> System.out.println(e));
-//      var a = new HorizontalLayout(updates, chart);
-//      a.setWidthFull();
-//
-//      //todo add to updates view
-//
-//      operations = new ButtonGroup();
-//      operations.add(ButtonFactory.createGreenButton("Sync", e -> {
-//      }));
-//      operations.add(ButtonFactory.createRedButton("Delete", e -> {
-//      }));
-//      operations.setMaxWidth("20%");
-//      operations.forEach(HasSize::setWidthFull);
-//      text.setWidthFull();
-//      HorizontalLayout l = new HorizontalLayout(text, operations);
-//      operations.getStyle().set("margin", "auto");
-//      operations.getStyle().set("display", "block");
-//      l.setWidthFull();
-//      add(a, l);
-//    }
-//
-//    public ResultChart<AbstractScalingQuestion> getChart() {
-//      return chart;
-//    }
-//
-//    public AnswersGrid getUpdates() {
-//      return updates;
-//    }
   }
 
 }
