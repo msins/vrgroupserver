@@ -2,23 +2,21 @@ package edu.vrgroup.model;
 
 import com.google.gson.annotations.Expose;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "Question")
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Question {
+public class Question {
 
   @Id
   @Column(name = "id")
-  @OnDelete(action = OnDeleteAction.CASCADE)
   @Expose
   protected Integer id;
 
@@ -26,16 +24,17 @@ public abstract class Question {
   @Expose
   protected String text;
 
-  @Column
-  protected Integer type;
+  @OneToMany
+  @JoinColumn(name = "questionId")
+  @Expose
+  private List<Choice> choices;
 
   public Question() {
   }
 
-  public Question(String text, Type type) {
+  public Question(String text) {
     this.text = text;
-    this.type = type.intValue();
-    this.id = text.hashCode();
+    this.id = text.hashCode() ^ ThreadLocalRandom.current().nextInt();
   }
 
   public Integer getId() {
@@ -46,31 +45,37 @@ public abstract class Question {
     return text;
   }
 
+  public void setChoices(List<Choice> choices) {
+    this.choices = choices;
+  }
+
   /**
    * Used to render answers in dashboard
    */
-  public abstract List<Choice> getChoices();
+  public List<Choice> getChoices() {
+    return choices;
+  }
+
+  public Question apply(String newText) {
+    Question newQuestion = new Question(newText);
+    List<Choice> newChoices = this.choices.stream()
+        .map(choice -> new Choice(newQuestion, choice.getValue()))
+        .collect(Collectors.toList());
+    newQuestion.setChoices(newChoices);
+    return newQuestion;
+  }
 
   public enum Type {
-    MULTIPLE_CHOICES(1, "Multiple choices"),
-    SCALING(2, "Scaling");
+    MULTIPLE_CHOICE("Multiple choices");
 
-    int type;
-    String name;
+    private String name;
 
-    Type(int type, String name) {
-      this.type = type;
+    Type(String name) {
       this.name = name;
-    }
-
-    public int intValue() {
-      return type;
     }
 
     public String getName() {
       return name;
     }
-
   }
-
 }

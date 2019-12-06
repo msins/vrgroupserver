@@ -15,7 +15,7 @@ public class Choice implements Serializable {
   @Id
   @ManyToOne
   @JoinColumn(name = "questionId", nullable = false, foreignKey = @ForeignKey(
-      foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES MultipleChoicesQuestion(questionId) ON DELETE CASCADE"
+      foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES Question(id) ON DELETE CASCADE ON UPDATE CASCADE"
   ))
   private Question question;
 

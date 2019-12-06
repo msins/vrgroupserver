@@ -1,6 +1,7 @@
 package edu.vrgroup.model;
 
 import java.io.Serializable;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,7 +17,7 @@ public class Game implements Serializable {
 
   public Game(String name) {
     this.name = name;
-    this.id = name.hashCode();
+    this.id = name.hashCode() ^ ThreadLocalRandom.current().nextInt();
   }
 
   public Game() {

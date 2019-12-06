@@ -20,28 +20,28 @@ public class Answer<T extends Question> implements Serializable {
   @Id
   @ManyToOne(targetEntity = Question.class)
   @JoinColumn(name = "questionId", nullable = false, foreignKey = @ForeignKey(
-      foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES Question(id) ON DELETE CASCADE"
+      foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES Question(id) ON DELETE CASCADE ON UPDATE CASCADE"
   ))
   private T question;
 
   @Id
   @ManyToOne(targetEntity = Scenario.class)
   @JoinColumn(name = "scenarioId", nullable = false, foreignKey = @ForeignKey(
-      foreignKeyDefinition = "FOREIGN KEY (scenarioId) REFERENCES Scenario(id) ON DELETE CASCADE"
+      foreignKeyDefinition = "FOREIGN KEY (scenarioId) REFERENCES Scenario(id) ON DELETE CASCADE ON UPDATE CASCADE"
   ))
   private Scenario scenario;
 
   @Id
   @ManyToOne
   @JoinColumn(name = "gameId", nullable = false, foreignKey = @ForeignKey(
-      foreignKeyDefinition = "FOREIGN KEY (gameId) REFERENCES Game(id) ON DELETE CASCADE"
+      foreignKeyDefinition = "FOREIGN KEY (gameId) REFERENCES Game(id) ON DELETE CASCADE ON UPDATE CASCADE"
   ))
   private Game game;
 
   @Id
   @ManyToOne
   @JoinColumn(name = "userId", nullable = false, foreignKey = @ForeignKey(
-      foreignKeyDefinition = "FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE"
+      foreignKeyDefinition = "FOREIGN KEY (userId) REFERENCES User(id) ON DELETE CASCADE ON UPDATE CASCADE"
   ))
   private User user;
 

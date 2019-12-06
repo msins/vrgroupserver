@@ -1,5 +1,6 @@
 package edu.vrgroup.model;
 
+import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,12 +18,16 @@ public class User {
   private String email;
 
   public User(String name, String email) {
-    this.id = name.hashCode();
+    this.id = name.hashCode() ^ ThreadLocalRandom.current().nextInt();
     this.name = name;
     this.email = email;
   }
 
   public User() {
+  }
+
+  public Integer getId() {
+    return id;
   }
 
   public String getName() {

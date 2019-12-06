@@ -6,7 +6,6 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.GameQuestion;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
-import edu.vrgroup.questions.MultipleChoicesQuestion;
 import java.util.List;
 import java.util.Map;
 import javax.persistence.EntityManager;
@@ -35,12 +34,30 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public void removeQuestion(Game game, Question question) {
+  public void updateQuestion(Game game, Question question, Question newQuestion) {
+    JpaEntityManagerProvider.getEntityManager()
+        .createQuery("update Question as q set q.id = :newQuestionId, q.text = :newText")
+        .setParameter("newQuestionId", newQuestion.getId())
+        .setParameter("newText", newQuestion.getText())
+        .executeUpdate();
+    JpaEntityManagerProvider.close();
+    JpaEntityManagerProvider.getEntityManager().clear(); //clear cache
+//    removeQuestion(question);
+
+    //replace choices primary keys to new questionId
+//    newQuestion.setChoices(question.getChoices().stream()
+//        .map(c -> new Choice(newQuestion, c.getValue()))
+//        .collect(Collectors.toList()));
+//    addQuestion(game, newQuestion);
+  }
+
+  @Override
+  public void removeQuestion(Question question) {
     EntityManager em = JpaEntityManagerProvider.getEntityManager();
     em.createQuery("delete from Question as q where q.id = :questionId")
-    .setParameter("questionId",question.getId()).executeUpdate();
+        .setParameter("questionId", question.getId()).executeUpdate();
     JpaEntityManagerProvider.close();
-    JpaEntityManagerProvider.getEntityManager().clear();
+    JpaEntityManagerProvider.getEntityManager().clear(); //clear cache
   }
 
   @Override
@@ -54,7 +71,7 @@ public class JpaDaoImpl implements Dao {
 
   @Override
   @SuppressWarnings("unchecked")
-  public List<Choice> getChoices(MultipleChoicesQuestion question) {
+  public List<Choice> getChoices(Question question) {
     List<Choice> results = (List<Choice>) JpaEntityManagerProvider.getEntityManager()
         .createQuery("select choice from Choice as choice where choice.question.id = :questionId")
         .setParameter("questionId", question.getId())

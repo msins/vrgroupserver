@@ -28,7 +28,6 @@ import edu.vrgroup.model.Scenario;
 import edu.vrgroup.questions.NewQuestionForm;
 import edu.vrgroup.ui.util.ButtonFactory;
 import java.time.format.DateTimeFormatter;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Route(value = "questions", layout = MainAppUi.class)
@@ -214,13 +213,13 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       layout.add(text);
 
       Button delete = ButtonFactory.createRedButton("Delete", e -> {
-        DaoProvider.getDao().removeQuestion(game, question);
+        DaoProvider.getDao().removeQuestion(question);
         removeAll();
         notifier.refreshAll();
       });
-      Button sync = ButtonFactory.createGreenButton("Sync", e -> {
-        DaoProvider.getDao().removeQuestion(game, question);
-      });
+      Button sync = ButtonFactory.createGreenButton("Sync", e -> DaoProvider.getDao().updateQuestion(game, question, new Question(text.getValue())));
+      sync.setEnabled(false);
+      text.addKeyPressListener(e -> sync.setEnabled(true));
 
       layout.add(new HorizontalLayout(delete, sync));
       add(layout);

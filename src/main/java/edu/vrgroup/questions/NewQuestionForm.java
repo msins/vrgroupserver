@@ -11,6 +11,7 @@ import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
+import edu.vrgroup.model.Question.Type;
 import edu.vrgroup.ui.util.ButtonFactory;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,20 +25,17 @@ public class NewQuestionForm extends Dialog {
   private VerticalLayout form;
 
   public NewQuestionForm(Game game, Consumer<Question> onCreate) {
-    Select<Question.Type> select = new Select<>(Question.Type.values());
+    Select<Question.Type> select = new Select<>(Type.values());
     select.setPlaceholder("Pick question type");
     select.setItemLabelGenerator(Question.Type::getName);
 
     layout = new VerticalLayout();
 
     select.addValueChangeListener(e -> {
-      layout.removeAll();
-      switch (e.getValue()) {
-        case MULTIPLE_CHOICES:
-          form = new MultipleChoicesQuestionForm();
-          layout.add(form);
-          break;
-        case SCALING:
+      if (select.getValue() == Type.MULTIPLE_CHOICE) {
+        layout.removeAll();
+        form = new MultipleChoicesQuestionForm();
+        layout.add(form);
       }
     });
 
@@ -50,44 +48,42 @@ public class NewQuestionForm extends Dialog {
       }
 
       //todo add other question types?
-      switch (select.getValue()) {
-        case MULTIPLE_CHOICES:
-          MultipleChoicesQuestionForm f = ((MultipleChoicesQuestionForm) form);
+      if (select.getValue() == Type.MULTIPLE_CHOICE) {
+        MultipleChoicesQuestionForm f = ((MultipleChoicesQuestionForm) form);
 
-          boolean hasError = false;
-          if (f.getText().getValue().trim().isEmpty()) {
-            f.getText().setInvalid(true);
-            hasError = true;
-          }
+        boolean hasError = false;
+        if (f.getText().getValue().trim().isEmpty()) {
+          f.getText().setInvalid(true);
+          hasError = true;
+        }
 
-          List<TextField> fields = f.getChoices().getFields();
-          if (fields.stream().filter(field -> !field.isEmpty()).count() < 2) {
-            for (int i = 0; i < 2; i++) {
-              if (fields.get(i).isEmpty()) {
-                fields.get(i).setInvalid(true);
-                hasError = true;
-              }
+        List<TextField> fields = f.getChoices().getFields();
+        if (fields.stream().filter(field -> !field.isEmpty()).count() < 2) {
+          for (int i = 0; i < 2; i++) {
+            if (fields.get(i).isEmpty()) {
+              fields.get(i).setInvalid(true);
+              hasError = true;
             }
           }
+        }
 
-          List<TextField> duplicates = fields.stream().filter(i -> Collections.frequency(fields, i) > 1)
+        List<TextField> duplicates = fields.stream().filter(i -> Collections.frequency(fields, i) > 1)
+            .collect(Collectors.toList());
+        if (duplicates.size() != 0) {
+          hasError = true;
+          duplicates.forEach(d -> d.setInvalid(true));
+        }
+        if (!hasError) {
+          String[] values = f.getChoicesValues();
+          Question newQuestion = new Question(f.getText().getValue());
+          List<Choice> choices = Arrays.stream(values)
+              .map(value -> new Choice(newQuestion, value))
               .collect(Collectors.toList());
-          if (duplicates.size() != 0) {
-            hasError = true;
-            duplicates.forEach(d -> d.setInvalid(true));
-          }
-          if (!hasError) {
-            String[] values = f.getChoicesValues();
-            MultipleChoicesQuestion newQuestion = new MultipleChoicesQuestion(f.getText().getValue());
-            List<Choice> choices = Arrays.stream(values)
-                .map(value -> new Choice(newQuestion, value))
-                .collect(Collectors.toList());
-            newQuestion.setChoices(choices);
-            DaoProvider.getDao().addQuestion(game, newQuestion);
-            onCreate.accept(newQuestion);
-            close();
-          }
-          break;
+          newQuestion.setChoices(choices);
+          DaoProvider.getDao().addQuestion(game, newQuestion);
+          onCreate.accept(newQuestion);
+          close();
+        }
       }
     });
 

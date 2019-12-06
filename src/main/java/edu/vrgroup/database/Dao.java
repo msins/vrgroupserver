@@ -5,7 +5,6 @@ import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
-import edu.vrgroup.questions.MultipleChoicesQuestion;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +14,13 @@ public interface Dao {
 
   void addQuestion(Game game, Question question);
 
-  void removeQuestion(Game game, Question question);
+  void removeQuestion(Question question);
+
+  void updateQuestion(Game game, Question question, Question newQuestion);
 
   int getQuestionsCount(Game game);
 
-  List<Choice> getChoices(MultipleChoicesQuestion question);
+  List<Choice> getChoices(Question question);
 
   int getGamesCount();
 

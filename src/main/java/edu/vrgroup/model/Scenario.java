@@ -1,6 +1,7 @@
 package edu.vrgroup.model;
 
 import com.google.gson.annotations.Expose;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -22,7 +23,7 @@ public class Scenario {
   }
 
   public Scenario(String name) {
-    this.id = name.hashCode();
+    this.id = name.hashCode() ^ ThreadLocalRandom.current().nextInt();
     this.name = name;
   }
 
