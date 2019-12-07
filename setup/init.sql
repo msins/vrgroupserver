@@ -27,7 +27,10 @@ create table GameQuestion
 
 create table Choice
 (
+     id         int                      not null
+        primary key,
     questionId int                      not null,
+    orderValue int                      not null,
     text       varchar(50) charset utf8 not null
 --     constraint Choice_Question_Id_fk
 --         foreign key (questionId) references Question (Id)
@@ -39,6 +42,13 @@ create table Scenario
     id   int         not null
         primary key,
     name varchar(50) not null
+);
+
+create table GameScenario
+(
+    gameId     int not null,
+    scenarioId int not null,
+    primary key (gameId, scenarioId)
 );
 
 create table User
@@ -55,8 +65,8 @@ create table Answer
     gameId           int         not null,
     scenarioId       int         not null,
     questionId       int         not null,
+    choiceId         int         not null,
     timestampCreated timestamp   not null,
-    score            int         not null,
     IPv4             varchar(16) null,
     primary key (userId, gameId, scenarioId, questionId, timestampCreated)
 --     constraint Answer_Game_id_fk
@@ -70,6 +80,9 @@ create table Answer
 --             on update cascade,
 --     constraint Answer_User_id_fk
 --         foreign key (userId) references User (id)
+--             on update cascade,
+--     constraint Answer_Choice_id_fk
+--         foreign key (choiceId) references Choice (id)
 --             on update cascade
 );
 
