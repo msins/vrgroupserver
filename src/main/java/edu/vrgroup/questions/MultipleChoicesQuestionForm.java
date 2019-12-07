@@ -7,6 +7,8 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import javax.persistence.criteria.CriteriaBuilder.In;
 
 public class MultipleChoicesQuestionForm extends VerticalLayout {
 
@@ -46,8 +48,29 @@ public class MultipleChoicesQuestionForm extends VerticalLayout {
     return choices;
   }
 
-  public String[] getChoicesValues() {
-    return choices.getFields().stream().map(TextField::getValue).toArray(String[]::new);
+  public IndexedChoice[] getChoicesValues() {
+    return IntStream.range(0, choices.getFields().size())
+        .mapToObj(i -> new IndexedChoice(i, choices.getFields().get(i).getValue()))
+        .toArray(IndexedChoice[]::new);
+  }
+
+  public static class IndexedChoice {
+
+    private int index;
+    private String value;
+
+    public IndexedChoice(int index, String value) {
+      this.index = index;
+      this.value = value;
+    }
+
+    public int getIndex() {
+      return index;
+    }
+
+    public String getValue() {
+      return value;
+    }
   }
 
   public static class Choices extends VerticalLayout {

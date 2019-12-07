@@ -7,8 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-@Entity(name = "GameQuestion")
-public class GameQuestion implements Serializable {
+@Entity(name = "GameScenario")
+public class GameScenario implements Serializable {
 
   @Id
   @ManyToOne
@@ -19,24 +19,25 @@ public class GameQuestion implements Serializable {
 
   @Id
   @ManyToOne
-  @JoinColumn(name = "questionId", nullable = false, foreignKey = @ForeignKey(
-      foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES Question(id) ON DELETE CASCADE ON UPDATE CASCADE"
+  @JoinColumn(name = "scenarioId", nullable = false, foreignKey = @ForeignKey(
+      foreignKeyDefinition = "FOREIGN KEY (scenarioId) REFERENCES Scenario(id) ON DELETE CASCADE ON UPDATE CASCADE"
   ))
-  private Question question;
+  private Scenario scenario;
 
-  public GameQuestion(Game game, Question question) {
+  public GameScenario(Game game, Scenario scenario) {
     this.game = game;
-    this.question = question;
+    this.scenario = scenario;
   }
 
-  public GameQuestion() {
+  public GameScenario() {
+
   }
 
   public Game getGame() {
     return game;
   }
 
-  public Question getQuestion() {
-    return question;
+  public Scenario getScenario() {
+    return scenario;
   }
 }

@@ -59,7 +59,7 @@ public class Question {
   public Question apply(String newText) {
     Question newQuestion = new Question(newText);
     List<Choice> newChoices = this.choices.stream()
-        .map(choice -> new Choice(newQuestion, choice.getValue()))
+        .map(old -> new Choice(newQuestion, old.getValue(), old.getOrder()))
         .collect(Collectors.toList());
     newQuestion.setChoices(newChoices);
     return newQuestion;

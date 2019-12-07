@@ -44,7 +44,7 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener {
         .setHeader(new Html("<b>Scenario</b>"));
     grid.addColumn(a -> a.getQuestion().getText())
         .setHeader(new Html("<b>Question</b>"));
-    grid.addColumn(a -> a.getQuestion().getChoices().get(a.getScore() - 1))
+    grid.addColumn(Answer::getChoice)
         .setHeader(new Html("<b>Score</b>"));
 
     grid.getColumns().forEach(e -> e.setAutoWidth(true));

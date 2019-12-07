@@ -180,7 +180,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
               .withProperty("user", Answer::getUser)
               .withProperty("IPv4", Answer::getIPv4))
           .setHeader(new Html("<b>User</b>"));
-      grid.addColumn(a -> a.getQuestion().getChoices().get(a.getScore() - 1))
+      grid.addColumn(Answer::getChoice)
           .setHeader(new Html("<b>Score</b>"));
 
       grid.getColumns().forEach(e -> e.setAutoWidth(true));

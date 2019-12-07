@@ -12,12 +12,14 @@ import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Question.Type;
+import edu.vrgroup.questions.MultipleChoicesQuestionForm.IndexedChoice;
 import edu.vrgroup.ui.util.ButtonFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.hibernate.engine.jdbc.StreamUtils;
 
 public class NewQuestionForm extends Dialog {
 
@@ -74,12 +76,13 @@ public class NewQuestionForm extends Dialog {
           duplicates.forEach(d -> d.setInvalid(true));
         }
         if (!hasError) {
-          String[] values = f.getChoicesValues();
+          IndexedChoice[] indexedChoices = f.getChoicesValues();
           Question newQuestion = new Question(f.getText().getValue());
-          List<Choice> choices = Arrays.stream(values)
-              .map(value -> new Choice(newQuestion, value))
+          List<Choice> choices = Arrays.stream(indexedChoices)
+              .map(c -> new Choice(newQuestion, c.getValue(), c.getIndex()))
               .collect(Collectors.toList());
           newQuestion.setChoices(choices);
+          System.out.println(newQuestion.getChoices());
           DaoProvider.getDao().addQuestion(game, newQuestion);
           onCreate.accept(newQuestion);
           close();

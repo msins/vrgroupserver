@@ -26,7 +26,7 @@ public interface Dao {
 
   List<Game> getGames();
 
-  boolean containsGame(Game game);
+  Game getGame(String gameName);
 
   void addGame(Game game);
 

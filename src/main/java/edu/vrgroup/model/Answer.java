@@ -45,8 +45,12 @@ public class Answer<T extends Question> implements Serializable {
   ))
   private User user;
 
-  @Column
-  private Integer score;
+  @Id
+  @ManyToOne
+  @JoinColumn(name = "choiceId", nullable = false, foreignKey = @ForeignKey(
+      foreignKeyDefinition = "FOREIGN KEY (choiceId) REFERENCES Choice(id) ON DELETE CASCADE ON UPDATE CASCADE"
+  ))
+  private Choice choice;
 
   @Column
   private String IPv4;
@@ -70,8 +74,8 @@ public class Answer<T extends Question> implements Serializable {
     return game;
   }
 
-  public Integer getScore() {
-    return score;
+  public Choice getChoice() {
+    return choice;
   }
 
   public String getIPv4() {
@@ -89,7 +93,7 @@ public class Answer<T extends Question> implements Serializable {
         .add("question", question)
         .add("scenario", scenario)
         .add("game", game)
-        .add("score", score)
+        .add("choice", choice)
         .add("IPv4", IPv4)
         .toString();
   }

@@ -27,7 +27,7 @@ public class ResultChart<T extends Question> extends Chart {
     //x axis
     XAxis x = new XAxis();
     x.setType(AxisType.CATEGORY);
-    x.setCategories(question.getChoices().stream().map(Choice::getValue).toArray(String[]::new));
+    x.setCategories(question.getChoices().stream().sorted().map(Choice::getValue).toArray(String[]::new));
     x.setTickLength(0);
     conf.addxAxis(x);
 

@@ -7,7 +7,6 @@ import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.util.JsonUtils;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -22,7 +21,7 @@ public class GamesService {
   @Path("{game}")
   @Produces(MediaType.APPLICATION_JSON)
   public Response getGameInformation(@PathParam("game") String game) {
-    GameResponse response = new GameResponse(new Game(game));
+    GameResponse response = new GameResponse(game);
 
     if (!response.gameExists()) {
       return Response.status(404).entity("There is no game with that name.").build();
@@ -41,13 +40,15 @@ public class GamesService {
     @Expose
     private List<Question> questions;
     private Game game;
+    private String gameName;
 
-    public GameResponse(Game game) {
-      this.game = game;
+    public GameResponse(String gameName) {
+      this.gameName = gameName;
     }
 
     public boolean gameExists() {
-      return DaoProvider.getDao().containsGame(game);
+      this.game = DaoProvider.getDao().getGame(gameName);
+      return this.game != null;
     }
 
     public void get() {

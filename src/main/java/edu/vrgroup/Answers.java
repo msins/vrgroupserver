@@ -1,6 +1,7 @@
 package edu.vrgroup;
 
 import edu.vrgroup.model.Answer;
+import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Question;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -11,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class Answers<T extends Question> {
   private int count;
-  private Map<Integer, Integer> counter = new HashMap<>();
+  private Map<Choice, Integer> counter = new HashMap<>();
   private Deque<Answer> answers = new ArrayDeque<>();
   private T question;
 
@@ -32,7 +33,7 @@ public class Answers<T extends Question> {
   public void add(Answer<T> answer) {
     count++;
     answers.addFirst(answer);
-    counter.merge(answer.getScore(), 1, Integer::sum);
+    counter.merge(answer.getChoice(), 1, Integer::sum);
   }
 
   public void addAll(List<Answer> answers) {
