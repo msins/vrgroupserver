@@ -3,10 +3,10 @@ package edu.vrgroup.ui;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.page.Push;
@@ -93,7 +93,7 @@ public class MainAppUi extends AppLayout implements GameChangeListener {
 
   private static Button createLogOutButton() {
     return new Button("Log out", e -> {
-      SecurityUtils.setIsUserLoggedIn(false);
+      SecurityUtils.setUserIsLoggedIn(false);
       UI.getCurrent().navigate("login");
     }) {{
       setThemeName("primary");

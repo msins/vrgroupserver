@@ -1,5 +1,6 @@
 package edu.vrgroup.questions;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.notification.Notification;
@@ -19,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import org.hibernate.engine.jdbc.StreamUtils;
 
 public class NewQuestionForm extends Dialog {
 
@@ -49,32 +49,36 @@ public class NewQuestionForm extends Dialog {
         return;
       }
 
-      //todo add other question types?
       if (select.getValue() == Type.MULTIPLE_CHOICE) {
         MultipleChoicesQuestionForm f = ((MultipleChoicesQuestionForm) form);
 
         boolean hasError = false;
         if (f.getText().getValue().trim().isEmpty()) {
+          f.getText().setErrorMessage("Required");
           f.getText().setInvalid(true);
           hasError = true;
         }
 
+
         List<TextField> fields = f.getChoices().getFields();
+        List<TextField> duplicates = fields.stream().filter(i -> Collections.frequency(fields, i) > 1)
+            .collect(Collectors.toList());
+        if (duplicates.size() != 0) {
+          hasError = true;
+          duplicates.forEach(d -> d.setErrorMessage("Duplicate choice"));
+          duplicates.forEach(d -> d.setInvalid(true));
+        }
+
         if (fields.stream().filter(field -> !field.isEmpty()).count() < 2) {
           for (int i = 0; i < 2; i++) {
             if (fields.get(i).isEmpty()) {
+              fields.get(i).setErrorMessage("Required");
               fields.get(i).setInvalid(true);
               hasError = true;
             }
           }
         }
 
-        List<TextField> duplicates = fields.stream().filter(i -> Collections.frequency(fields, i) > 1)
-            .collect(Collectors.toList());
-        if (duplicates.size() != 0) {
-          hasError = true;
-          duplicates.forEach(d -> d.setInvalid(true));
-        }
         if (!hasError) {
           IndexedChoice[] indexedChoices = f.getChoicesValues();
           Question newQuestion = new Question(f.getText().getValue());
@@ -89,6 +93,7 @@ public class NewQuestionForm extends Dialog {
         }
       }
     });
+    createBtn.addClickShortcut(Key.ENTER);
 
     Button closeBtn = ButtonFactory.createRedButton("Cancel", e -> close());
 

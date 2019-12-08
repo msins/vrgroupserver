@@ -1,5 +1,6 @@
 package edu.vrgroup.ui;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -16,8 +17,10 @@ public class NewGameForm extends Dialog {
     gameField.setPlaceholder("New game...");
 
     Button createBtn = ButtonFactory.createPrimaryButton("Create", e -> {
-      if (gameField.isEmpty()) {
+      if (gameField.getValue().trim().isEmpty()) {
         gameField.setErrorMessage("Enter game");
+        gameField.setInvalid(true);
+        return;
       }
 
       Game game = new Game(gameField.getValue());
@@ -26,7 +29,7 @@ public class NewGameForm extends Dialog {
       select.setValue(game);
       close();
     });
-
+    createBtn.addClickShortcut(Key.ENTER);
     Button closeBtn = ButtonFactory.createRedButton("Cancel", e -> close());
 
     add(new HorizontalLayout(gameField, createBtn, closeBtn));
