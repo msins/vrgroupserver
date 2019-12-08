@@ -1,6 +1,5 @@
 package edu.vrgroup;
 
-import com.vaadin.flow.server.VaadinSession;
 import edu.vrgroup.database.JpaEntityManagerFactoryProvider;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -26,4 +25,5 @@ public class Initialization implements ServletContextListener {
       emf.close();
     }
   }
+
 }
