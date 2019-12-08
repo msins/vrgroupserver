@@ -1,13 +1,14 @@
 package edu.vrgroup.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity(name = "Game")
-public class Game implements Serializable {
+public class Game implements Serializable, Comparable<Game> {
 
   @Id
   private Integer id;
@@ -47,19 +48,22 @@ public class Game implements Serializable {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-
     Game game = (Game) o;
-
-    return name.equals(game.name);
+    return id.equals(game.id);
   }
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return Objects.hash(id);
   }
 
   @Override
   public String toString() {
     return name;
+  }
+
+  @Override
+  public int compareTo(Game other) {
+    return this.name.compareTo(other.name);
   }
 }

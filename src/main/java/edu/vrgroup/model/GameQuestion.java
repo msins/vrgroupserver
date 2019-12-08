@@ -1,6 +1,7 @@
 package edu.vrgroup.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
 import javax.persistence.Id;
@@ -38,5 +39,23 @@ public class GameQuestion implements Serializable {
 
   public Question getQuestion() {
     return question;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    GameQuestion that = (GameQuestion) o;
+    return game.equals(that.game) &&
+        question.equals(that.question);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(game, question);
   }
 }

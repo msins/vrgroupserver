@@ -1,13 +1,15 @@
 package edu.vrgroup.model;
 
 import com.google.gson.annotations.Expose;
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class Scenario {
+public class Scenario implements Serializable, Comparable<Scenario> {
 
   public static Scenario DEFAULT = new Scenario("Default");
 
@@ -51,19 +53,22 @@ public class Scenario {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-
     Scenario scenario = (Scenario) o;
-
-    return name.equals(scenario.name);
+    return id.equals(scenario.id);
   }
 
   @Override
   public int hashCode() {
-    return name.hashCode();
+    return Objects.hash(id);
   }
 
   @Override
   public String toString() {
     return name;
+  }
+
+  @Override
+  public int compareTo(Scenario other) {
+    return this.name.compareTo(other.name);
   }
 }

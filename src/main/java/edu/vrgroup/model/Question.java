@@ -1,7 +1,9 @@
 package edu.vrgroup.model;
 
 import com.google.gson.annotations.Expose;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
@@ -13,7 +15,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "Question")
-public class Question {
+public class Question implements Serializable, Comparable<Question> {
 
   @Id
   @Column(name = "id")
@@ -78,4 +80,27 @@ public class Question {
       return name;
     }
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Question question = (Question) o;
+    return id.equals(question.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
+
+  @Override
+  public int compareTo(Question other) {
+    return this.text.compareTo(other.text);
+  }
+
 }

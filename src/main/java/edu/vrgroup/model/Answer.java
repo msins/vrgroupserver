@@ -3,6 +3,7 @@ package edu.vrgroup.model;
 import com.google.common.base.MoreObjects;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
@@ -11,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Answer<T extends Question> implements Serializable {
+public class Answer<T extends Question> implements Serializable, Comparable<Answer> {
 
   @Id
   @Column(name = "timestampCreated")
@@ -96,5 +97,32 @@ public class Answer<T extends Question> implements Serializable {
         .add("choice", choice)
         .add("IPv4", IPv4)
         .toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Answer<?> answer = (Answer<?>) o;
+    return timestamp.equals(answer.timestamp) &&
+        question.equals(answer.question) &&
+        scenario.equals(answer.scenario) &&
+        game.equals(answer.game) &&
+        user.equals(answer.user) &&
+        choice.equals(answer.choice);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(timestamp, question, scenario, game, user, choice);
+  }
+
+  @Override
+  public int compareTo(Answer other) {
+    return this.timestamp.compareTo(other.timestamp);
   }
 }

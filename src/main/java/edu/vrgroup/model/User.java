@@ -1,12 +1,14 @@
 package edu.vrgroup.model;
 
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class User {
+public class User implements Serializable, Comparable<User> {
 
   @Id
   private Integer id;
@@ -36,5 +38,27 @@ public class User {
 
   public String getEmail() {
     return email;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    User user = (User) o;
+    return id.equals(user.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
+  }
+
+  @Override
+  public int compareTo(User other) {
+    return this.name.compareTo(other.name);
   }
 }

@@ -2,6 +2,7 @@ package edu.vrgroup.model;
 
 import com.google.gson.annotations.Expose;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +10,6 @@ import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.criteria.CriteriaBuilder.In;
 
 @Entity(name = "Choice")
 public class Choice implements Serializable, Comparable<Choice> {
@@ -62,6 +62,23 @@ public class Choice implements Serializable, Comparable<Choice> {
   @Override
   public String toString() {
     return value;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Choice choice = (Choice) o;
+    return id.equals(choice.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id);
   }
 
   @Override
