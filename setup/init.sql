@@ -53,10 +53,12 @@ create table GameScenario
 
 create table User
 (
-    id    int         not null
+    id     int         not null
         primary key,
-    name  varchar(50) not null,
-    email varchar(50) null
+    name   varchar(50) not null,
+    email  varchar(50) null,
+    gender char        null,
+    age    int         null
 );
 
 create table Answer
@@ -85,4 +87,6 @@ create table Answer
 --         foreign key (choiceId) references Choice (id)
 --             on update cascade
 );
+
+insert into Scenario values(0, 'Default');
 

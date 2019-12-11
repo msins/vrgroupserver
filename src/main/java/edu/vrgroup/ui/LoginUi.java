@@ -9,7 +9,6 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import edu.vrgroup.DatabaseUtil;
-import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.util.SecurityUtils;
 
 @Route("login")
@@ -20,14 +19,11 @@ public class LoginUi extends HorizontalLayout implements BeforeEnterObserver {
   private LoginForm form = new LoginForm();
 
   public LoginUi() {
-//    SecurityUtils.setUserIsLoggedIn();
-//    this.getUI().ifPresent(ui -> ui.navigate(DashboardUi.class));
-
     form.setForgotPasswordButtonVisible(false);
     form.addLoginListener(e -> {
       if (authenticate(e)) {
         SecurityUtils.setUserIsLoggedIn(true);
-        this.getUI().ifPresent(ui -> ui.navigate(MainAppUi.class));
+        this.getUI().ifPresent(ui -> ui.navigate(DashboardUi.class));
       } else {
         form.setError(true);
       }

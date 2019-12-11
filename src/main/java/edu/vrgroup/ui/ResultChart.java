@@ -8,16 +8,24 @@ import com.vaadin.flow.component.charts.model.ListSeries;
 import com.vaadin.flow.component.charts.model.Tooltip;
 import com.vaadin.flow.component.charts.model.XAxis;
 import com.vaadin.flow.component.charts.model.YAxis;
+import edu.vrgroup.database.Dao;
+import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Choice;
+import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
+import edu.vrgroup.model.Scenario;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 
 public class ResultChart<T extends Question> extends Chart {
 
   private T question;
+  private ListSeries series = new ListSeries();
 
   public ResultChart(T question) {
     super(ChartType.BAR);
-    this.question = question;
+    this.question = Objects.requireNonNull(question);
     initChar();
   }
 
@@ -49,19 +57,20 @@ public class ResultChart<T extends Question> extends Chart {
         "return this.y.toFixed(1) + '%';" +
         "}");
     conf.setTooltip(tooltip);
-    setEmptySeries();
+    series.setData(getEmptySeries());
+    getConfiguration().addSeries(series);
   }
 
-  public void update(ListSeries series) {
-    getConfiguration().setSeries(series);
+  public void refresh(Number[] stats) {
+    this.series.setData(stats);
+    series.updateSeries();
   }
 
   public T getQuestion() {
     return question;
   }
 
-  private void setEmptySeries() {
-    Number[] nums = new Number[question.getChoices().size()];
-    getConfiguration().setSeries(new ListSeries(nums));
+  private Number[] getEmptySeries() {
+    return new Number[question.getChoices().size()];
   }
 }

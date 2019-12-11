@@ -6,9 +6,9 @@ import com.vaadin.flow.server.VaadinSession;
 public class SecurityUtils {
 
   public static boolean isUserLoggedIn() {
-    if (VaadinSession.getCurrent() != null) {
+    if (VaadinSession.getCurrent().getSession() != null) {
       Object isLoggedIn = VaadinSession.getCurrent().getAttribute("user.logged.in");
-      return isLoggedIn != null && ((boolean) isLoggedIn);
+      return (isLoggedIn instanceof Boolean) && ((boolean) isLoggedIn);
     }
     return false;
   }

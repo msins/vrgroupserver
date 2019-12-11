@@ -1,4 +1,4 @@
-package edu.vrgroup.questions;
+package edu.vrgroup.ui;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -13,7 +13,7 @@ import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Question.Type;
-import edu.vrgroup.questions.MultipleChoicesQuestionForm.IndexedChoice;
+import edu.vrgroup.ui.MultipleChoicesQuestionForm.IndexedChoice;
 import edu.vrgroup.ui.util.ButtonFactory;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,12 +81,11 @@ public class NewQuestionForm extends Dialog {
 
         if (!hasError) {
           IndexedChoice[] indexedChoices = f.getChoicesValues();
-          Question newQuestion = new Question(f.getText().getValue());
+          Question newQuestion = new Question(f.getText().getValue(), Type.MULTIPLE_CHOICE);
           List<Choice> choices = Arrays.stream(indexedChoices)
               .map(c -> new Choice(newQuestion, c.getValue(), c.getIndex()))
               .collect(Collectors.toList());
           newQuestion.setChoices(choices);
-          System.out.println(newQuestion.getChoices());
           DaoProvider.getDao().addQuestion(game, newQuestion);
           onCreate.accept(newQuestion);
           close();

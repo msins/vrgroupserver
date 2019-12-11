@@ -8,6 +8,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -31,12 +33,18 @@ public class Question implements Serializable, Comparable<Question> {
   @Expose
   private List<Choice> choices;
 
+  @Enumerated(EnumType.ORDINAL)
+  @Column
+  @Expose
+  private Type type;
+
   public Question() {
   }
 
-  public Question(String text) {
+  public Question(String text, Type type) {
     this.text = text;
     this.id = text.hashCode() ^ ThreadLocalRandom.current().nextInt();
+    this.type = type;
   }
 
   public Integer getId() {
@@ -45,6 +53,10 @@ public class Question implements Serializable, Comparable<Question> {
 
   public String getText() {
     return text;
+  }
+
+  public Type getType() {
+    return type;
   }
 
   public void setChoices(List<Choice> choices) {
@@ -58,8 +70,8 @@ public class Question implements Serializable, Comparable<Question> {
     return choices;
   }
 
-  public Question apply(String newText) {
-    Question newQuestion = new Question(newText);
+  public Question apply(String newText, Type type) {
+    Question newQuestion = new Question(newText, type);
     List<Choice> newChoices = this.choices.stream()
         .map(old -> new Choice(newQuestion, old.getValue(), old.getOrder()))
         .collect(Collectors.toList());
@@ -70,6 +82,7 @@ public class Question implements Serializable, Comparable<Question> {
   public enum Type {
     MULTIPLE_CHOICE("Multiple choices");
 
+    @Column(name = "name")
     private String name;
 
     Type(String name) {
@@ -77,6 +90,11 @@ public class Question implements Serializable, Comparable<Question> {
     }
 
     public String getName() {
+      return name;
+    }
+
+    @Override
+    public String toString() {
       return name;
     }
   }

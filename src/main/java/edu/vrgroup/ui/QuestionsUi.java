@@ -1,6 +1,7 @@
 package edu.vrgroup.ui;
 
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -15,19 +16,25 @@ import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinSession;
 import edu.vrgroup.GameChangeListener;
-import edu.vrgroup.GameChangeNotifier;
 import edu.vrgroup.ScenarioChangeListener;
 import edu.vrgroup.ScenarioChangeNotifier;
 import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Answer;
+import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
-import edu.vrgroup.questions.NewQuestionForm;
+import edu.vrgroup.model.User;
 import edu.vrgroup.ui.util.ButtonFactory;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 @Route(value = "questions", layout = MainAppUi.class)
@@ -48,12 +55,13 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
     }
     setSizeFull();
 
-    questions.addValueChangeListener(e -> {
+    questions.addValueChangeListener(list -> {
       QuestionView old = questionInformation;
-      if (e.getValue() != null) {
-        questionInformation = new QuestionView(game,
+      if (list.getValue() != null) {
+        questionInformation = new QuestionView(
+            this.game,
             scenarioNotifier.getScenario(),
-            e.getValue(),
+            list.getValue(),
             questions.getDataProvider());
       }
 
@@ -73,13 +81,14 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
-    System.out.println("attach to questions " + attachEvent.getSession());
-
+    super.onAttach(attachEvent);
     registerToGameNotifier();
-    Game game = ((GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier")).getGame();
-    if (game != null) {
-      gameChanged(game);
-    }
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    super.onDetach(detachEvent);
+    unregisterFromGameNotifier();
   }
 
   @Override
@@ -169,6 +178,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
 
     private void initUi() {
       chart = new ResultChart<>(question);
+
       grid = new AnswersGrid();
       chart.setWidthFull();
       grid.setWidthFull();
@@ -197,9 +207,26 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
           return DaoProvider.getDao().getAnswersCount(game, scenario, question);
         }
       });
-      add(new Button("xd", e -> {
-        System.err.println(DaoProvider.getDao().getQuestionStatistics(game, scenario, question));
-
+      add(new Button("Generate answer", e -> {
+        User user = new User("Marko", "m.sinko" + ThreadLocalRandom.current().nextInt() + "@hotmail.com");
+        DaoProvider.getDao().addUser(user);
+        DaoProvider.getDao().addAnswer(
+            game,
+            scenario,
+            question,
+            question.getChoices().get(ThreadLocalRandom.current().nextInt(question.getChoices().size())),
+            user,
+            Timestamp.from(Instant.now()),
+            "127.0.0.1");
+      }));
+      add(new Button(VaadinIcon.REFRESH.create(), e -> {
+        List<Answer> answers = DaoProvider.getDao().getAllAnswers(game, scenario, question);
+        Map<Choice, Integer> counter = new TreeMap<>();
+        answers.forEach(a -> counter.merge(a.getChoice(), 1, Integer::sum));
+        Number[] stats =counter.values().stream()
+            .map(value -> (value.doubleValue() / answers.size()) * 100)
+            .toArray(Number[]::new);
+        chart.refresh(stats);
       }));
       VerticalLayout layout = new VerticalLayout();
       layout.setAlignItems(Alignment.CENTER);
@@ -217,7 +244,8 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
         removeAll();
         notifier.refreshAll();
       });
-      Button sync = ButtonFactory.createGreenButton("Sync", e -> DaoProvider.getDao().updateQuestion(game, question, new Question(text.getValue())));
+      Button sync = ButtonFactory.createGreenButton("Sync",
+          e -> DaoProvider.getDao().updateQuestion(game, question, new Question(text.getValue(), question.getType())));
       sync.setEnabled(false);
       text.addKeyPressListener(e -> sync.setEnabled(true));
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <File name="RestLogs" fileName="logs/rest.log" append="true">
+      <PatternLayout>
+        <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
+      </PatternLayout>
+    </File>
+  </Appenders>
+<Loggers>
+  <Logger name="edu.vrgroup.rest.GamesService" level="INFO">
+    <AppenderRef ref="RestLogs"/>
+  </Logger>
+</Loggers>
+</Configuration>

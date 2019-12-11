@@ -2,6 +2,7 @@ package edu.vrgroup.ui;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.Tabs.Orientation;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.Query;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
@@ -33,6 +35,7 @@ import java.util.stream.Stream;
 @Route("")
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @Push(PushMode.AUTOMATIC)
+@PreserveOnRefresh
 @PWA(name = "Administrator dashboard", shortName = "Dashboard")
 public class MainAppUi extends AppLayout implements GameChangeListener {
 
@@ -42,7 +45,8 @@ public class MainAppUi extends AppLayout implements GameChangeListener {
     gameSelect.addValueChangeListener(e -> {
       Game game = e.getValue();
       if (game != null) {
-        ((GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier")).setGame(game);
+        GameChangeNotifier notifier = ((GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier"));
+        notifier.setGame(game);
       }
     });
     addToNavbar(true, createNewGameButton(gameSelect));
@@ -141,21 +145,17 @@ public class MainAppUi extends AppLayout implements GameChangeListener {
     if (!SecurityUtils.isUserLoggedIn()) {
       getUI().ifPresent(ui -> ui.navigate("login"));
     }
-
-    //return current game on refresh
     registerToGameNotifier();
-    Game game = null;
-    Object notifier = VaadinSession.getCurrent().getAttribute("game.notifier");
-    if (notifier != null) {
-      game = ((GameChangeNotifier) notifier).getGame();
-    }
-    if (game != null) {
-      gameSelect.setValue(game);
-    }
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    super.onDetach(detachEvent);
+    unregisterFromGameNotifier();
   }
 
   @Override
   public void gameChanged(Game game) {
-    //do nothing for now
+    gameSelect.setValue(game);
   }
 }

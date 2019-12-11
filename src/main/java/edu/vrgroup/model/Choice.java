@@ -29,7 +29,6 @@ public class Choice implements Serializable, Comparable<Choice> {
   private String value;
 
   @Column(name = "orderValue")
-  @Expose
   private Integer order;
 
   public Choice() {

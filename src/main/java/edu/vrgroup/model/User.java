@@ -19,10 +19,24 @@ public class User implements Serializable, Comparable<User> {
   @Column
   private String email;
 
+  @Column
+  private String gender;
+
+  @Column
+  private int age;
+
   public User(String name, String email) {
     this.id = name.hashCode() ^ ThreadLocalRandom.current().nextInt();
     this.name = name;
     this.email = email;
+  }
+
+  public User(String name, String email, String gender, int age) {
+    this.id = name.hashCode() ^ ThreadLocalRandom.current().nextInt();
+    this.name = name;
+    this.email = email;
+    this.gender = gender;
+    this.age = age;
   }
 
   public User() {
@@ -38,6 +52,14 @@ public class User implements Serializable, Comparable<User> {
 
   public String getEmail() {
     return email;
+  }
+
+  public String getGender() {
+    return gender;
+  }
+
+  public int getAge() {
+    return age;
   }
 
   @Override

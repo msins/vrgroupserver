@@ -11,7 +11,7 @@ import javax.persistence.Id;
 @Entity
 public class Scenario implements Serializable, Comparable<Scenario> {
 
-  public static Scenario DEFAULT = new Scenario("Default");
+  public static Scenario DEFAULT;
 
   @Id
   @Expose

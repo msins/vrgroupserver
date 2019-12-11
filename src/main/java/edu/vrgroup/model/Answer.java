@@ -59,32 +59,71 @@ public class Answer<T extends Question> implements Serializable, Comparable<Answ
   public Answer() {
   }
 
+  public Answer(Timestamp timestamp, T question, Scenario scenario, Game game, User user, Choice choice,
+      String IPv4) {
+    this.timestamp = timestamp;
+    this.question = question;
+    this.scenario = scenario;
+    this.game = game;
+    this.user = user;
+    this.choice = choice;
+    this.IPv4 = IPv4;
+  }
+
   public Timestamp getTimestamp() {
     return timestamp;
+  }
+
+  public void setTimestamp(Timestamp timestamp) {
+    this.timestamp = timestamp;
   }
 
   public T getQuestion() {
     return question;
   }
 
+  public void setQuestion(T question) {
+    this.question = question;
+  }
+
   public Scenario getScenario() {
     return scenario;
+  }
+
+  public void setScenario(Scenario scenario) {
+    this.scenario = scenario;
   }
 
   public Game getGame() {
     return game;
   }
 
+  public void setGame(Game game) {
+    this.game = game;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
+
   public Choice getChoice() {
     return choice;
+  }
+
+  public void setChoice(Choice choice) {
+    this.choice = choice;
   }
 
   public String getIPv4() {
     return IPv4;
   }
 
-  public User getUser() {
-    return user;
+  public void setIPv4(String IPv4) {
+    this.IPv4 = IPv4;
   }
 
   @Override

@@ -5,6 +5,9 @@ import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
+import edu.vrgroup.model.User;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +45,14 @@ public interface Dao {
 
   List<Answer> getAnswers(Game game, Scenario scenario, Question question, int offset, int limit);
 
+  List<Answer> getAllAnswers(Game game, Scenario scenario, Question question);
+
+  void addAnswer(Game game, Scenario scenario, Question question, Choice choice, User user, Timestamp timestamp,
+      String IPv4);
+
   int getAnswersCount(Game game, Scenario scenario, Question question);
 
-  Map<Choice, Integer> getQuestionStatistics(Game game, Scenario scenario, Question question);
+  void addUser(User user);
+  void addScenario(Scenario scenario);
+  Scenario getDefaultScenario();
 }

@@ -14,6 +14,15 @@ public interface GameChangeListener {
       VaadinSession.getCurrent().setAttribute("game.notifier", notifier);
     }
     notifier.registerListener(this);
+    if (notifier.getGame() != null) {
+      gameChanged(notifier.getGame());
+    }
   }
 
+  default void unregisterFromGameNotifier() {
+    GameChangeNotifier notifier = (GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier");
+    if (notifier != null) {
+      notifier.unregisterListener(this);
+    }
+  }
 }

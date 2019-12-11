@@ -1,6 +1,7 @@
 package edu.vrgroup.ui;
 
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
@@ -21,6 +22,11 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener {
   @Override
   protected void onAttach(AttachEvent attachEvent) {
     registerToGameNotifier();
+  }
+
+  @Override
+  protected void onDetach(DetachEvent detachEvent) {
+    unregisterFromGameNotifier();
   }
 
   AnswersGrid grid = new AnswersGrid();
@@ -72,7 +78,6 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener {
 
     @Override
     protected Stream<Answer> fetchFromBackEnd(Query<Answer, Object> query) {
-      System.out.println("offset: " + query.getOffset() + ", limit: " + query.getLimit());
       return DaoProvider.getDao().getAnswers(game, query.getOffset(), query.getLimit()).stream();
     }
 

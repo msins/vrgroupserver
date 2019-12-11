@@ -4,21 +4,23 @@ import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.GameQuestion;
+import edu.vrgroup.model.GameScenario;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
+import edu.vrgroup.model.User;
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 
 public class JpaDaoImpl implements Dao {
 
   @Override
-  @SuppressWarnings("unchecked")
   public List<Question> getQuestions(Game game) {
-    return (List<Question>) JpaEntityManagerProvider.getEntityManager()
+    return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
-            "select q from Question as q, GameQuestion as gq where q.id = gq.question.id and gq.game.id = :gameId")
+            "select q from Question as q, GameQuestion as gq where q.id = gq.question.id and gq.game.id = :gameId",
+            Question.class)
         .setParameter("gameId", game.getId())
         .getResultList();
   }
@@ -101,6 +103,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   public void addGame(Game game) {
     JpaEntityManagerProvider.getEntityManager().persist(game);
+    JpaEntityManagerProvider.getEntityManager().persist(new GameScenario(game, Scenario.DEFAULT));
     commit();
   }
 
@@ -161,25 +164,60 @@ public class JpaDaoImpl implements Dao {
         .setParameter("gameId", game.getId())
         .setParameter("scenarioId", scenario.getId())
         .setParameter("questionId", question.getId())
+        .setFirstResult(offset)
+        .setMaxResults(limit)
+        .getResultList();
+  }
+
+  @Override
+  public List<Answer> getAllAnswers(Game game, Scenario scenario, Question question) {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery(
+            "select answer from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId",
+            Answer.class)
+        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
+        .setParameter("questionId", question.getId())
         .getResultList();
   }
 
   @Override
   public int getAnswersCount(Game game, Scenario scenario, Question question) {
-    return ((Long) JpaEntityManagerProvider.getEntityManager()
+    return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
-            "select count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId")
+            "select count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId",
+            Long.class)
         .setParameter("gameId", game.getId())
         .setParameter("scenarioId", scenario.getId())
         .setParameter("questionId", question.getId())
-        .getSingleResult()).intValue();
+        .getSingleResult().intValue();
   }
 
   @Override
-  public Map<Choice, Integer> getQuestionStatistics(Game game, Scenario scenario, Question question) {
-//    JpaEntityManagerProvider.getEntityManager()
-//        .createQuery("select new map(choice, count(*)) from Answer ")
-    return null;
+  public void addAnswer(Game game, Scenario scenario, Question question, Choice choice, User user, Timestamp timestamp,
+      String IPv4) {
+    Answer<Question> answer = new Answer<>(timestamp, question, scenario, game, user, choice, IPv4);
+    JpaEntityManagerProvider.getEntityManager().persist(answer);
+    commit();
+  }
+
+  @Override
+  public void addUser(User user) {
+    JpaEntityManagerProvider.getEntityManager().persist(user);
+    commit();
+  }
+
+  @Override
+  public void addScenario(Scenario scenario) {
+    JpaEntityManagerProvider.getEntityManager().persist(scenario);
+    commit();
+  }
+
+  @Override
+  public Scenario getDefaultScenario() {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery("select s from Scenario as s where s.name='Default'", Scenario.class)
+        .getSingleResult();
   }
 
   private void clearCache() {

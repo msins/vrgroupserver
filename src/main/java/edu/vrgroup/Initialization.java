@@ -1,6 +1,8 @@
 package edu.vrgroup;
 
+import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.database.JpaEntityManagerFactoryProvider;
+import edu.vrgroup.model.Scenario;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
@@ -15,6 +17,9 @@ public class Initialization implements ServletContextListener {
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("vr.server.db");
     sce.getServletContext().setAttribute("my.application.emf", emf);
     JpaEntityManagerFactoryProvider.setEmf(emf);
+    if (Scenario.DEFAULT == null) {
+      Scenario.DEFAULT = DaoProvider.getDao().getDefaultScenario();
+    }
   }
 
   @Override
