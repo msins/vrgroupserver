@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
@@ -74,6 +75,7 @@ public class Question implements Serializable, Comparable<Question> {
     Question newQuestion = new Question(newText, type);
     List<Choice> newChoices = this.choices.stream()
         .map(old -> new Choice(newQuestion, old.getValue(), old.getOrder()))
+        .sorted()
         .collect(Collectors.toList());
     newQuestion.setChoices(newChoices);
     return newQuestion;

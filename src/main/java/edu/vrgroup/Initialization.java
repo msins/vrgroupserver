@@ -17,6 +17,7 @@ public class Initialization implements ServletContextListener {
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("vr.server.db");
     sce.getServletContext().setAttribute("my.application.emf", emf);
     JpaEntityManagerFactoryProvider.setEmf(emf);
+
     if (Scenario.DEFAULT == null) {
       Scenario.DEFAULT = DaoProvider.getDao().getDefaultScenario();
     }

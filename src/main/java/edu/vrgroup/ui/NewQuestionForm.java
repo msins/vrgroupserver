@@ -18,6 +18,7 @@ import edu.vrgroup.ui.util.ButtonFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -84,6 +85,7 @@ public class NewQuestionForm extends Dialog {
           Question newQuestion = new Question(f.getText().getValue(), Type.MULTIPLE_CHOICE);
           List<Choice> choices = Arrays.stream(indexedChoices)
               .map(c -> new Choice(newQuestion, c.getValue(), c.getIndex()))
+              .sorted()
               .collect(Collectors.toList());
           newQuestion.setChoices(choices);
           DaoProvider.getDao().addQuestion(game, newQuestion);

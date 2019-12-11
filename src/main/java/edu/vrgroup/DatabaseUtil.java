@@ -12,6 +12,7 @@ public final class DatabaseUtil {
             "hibernate.connection.username", name,
             "hibernate.connection.password", password))
     );
+
   }
 
 }

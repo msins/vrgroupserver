@@ -7,6 +7,7 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.util.JsonUtils;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
@@ -53,7 +54,7 @@ public class GamesService {
     private List<Scenario> scenarios;
 
     @Expose
-    private TreeSet<Question> questions;
+    private List<Question> questions;
 
     private Game game;
     private String gameName;
@@ -68,7 +69,10 @@ public class GamesService {
     }
 
     public void get() {
-      questions = new TreeSet<>(DaoProvider.getDao().getQuestions(game));
+      questions = DaoProvider.getDao().getQuestions(game);
+      for (Question question : questions) {
+        Collections.sort(question.getChoices());
+      }
       scenarios = List.of(Scenario.DEFAULT);
     }
   }

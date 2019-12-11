@@ -10,10 +10,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import edu.vrgroup.DatabaseUtil;
 import edu.vrgroup.util.SecurityUtils;
+import java.sql.SQLException;
 
 @Route("login")
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
-@PageTitle("dashboard-view")
+@PageTitle("Login")
 public class LoginUi extends HorizontalLayout implements BeforeEnterObserver {
 
   private LoginForm form = new LoginForm();
