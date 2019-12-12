@@ -207,6 +207,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
           return DaoProvider.getDao().getAnswersCount(game, scenario, question);
         }
       });
+
       add(new Button("Generate answer", e -> {
         User user = new User("Marko", "m.sinko" + ThreadLocalRandom.current().nextInt() + "@hotmail.com");
         DaoProvider.getDao().addUser(user);
@@ -219,15 +220,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
             Timestamp.from(Instant.now()),
             "127.0.0.1");
       }));
-      add(new Button(VaadinIcon.REFRESH.create(), e -> {
-        List<Answer> answers = DaoProvider.getDao().getAllAnswers(game, scenario, question);
-        Map<Choice, Integer> counter = new TreeMap<>();
-        answers.forEach(a -> counter.merge(a.getChoice(), 1, Integer::sum));
-        Number[] stats =counter.values().stream()
-            .map(value -> (value.doubleValue() / answers.size()) * 100)
-            .toArray(Number[]::new);
-        chart.refresh(stats);
-      }));
+
       VerticalLayout layout = new VerticalLayout();
       layout.setAlignItems(Alignment.CENTER);
       HorizontalLayout gridChart = new HorizontalLayout(grid, chart);
@@ -239,19 +232,42 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       text.setWidthFull();
       layout.add(text);
 
+      Button refresh = new Button(VaadinIcon.REFRESH.create(), e -> {
+        List<Answer> answers = DaoProvider.getDao().getAllAnswers(game, scenario, question);
+        Number[] stats = QuestionStatistics.get(answers, question);
+        chart.refresh(stats);
+        grid.getDataProvider().refreshAll();
+      });
+      refresh.click();
+
       Button delete = ButtonFactory.createRedButton("Delete", e -> {
         DaoProvider.getDao().removeQuestion(question);
         removeAll();
         notifier.refreshAll();
       });
       Button sync = ButtonFactory.createGreenButton("Sync",
-          e -> DaoProvider.getDao().updateQuestion(game, question, new Question(text.getValue(), question.getType())));
+          e -> {
+            DaoProvider.getDao().updateQuestion(question, text.getValue());
+            notifier.refreshAll();
+          });
       sync.setEnabled(false);
       text.addKeyPressListener(e -> sync.setEnabled(true));
 
-      layout.add(new HorizontalLayout(delete, sync));
+      layout.add(new HorizontalLayout(refresh, delete, sync));
       add(layout);
     }
   }
 
+
+  private static final class QuestionStatistics {
+
+    public static Number[] get(List<Answer> answers, Question question) {
+      Map<Choice, Integer> counter = new TreeMap<>();
+      question.getChoices().forEach(c -> counter.put(c, 0));
+      answers.forEach(a -> counter.merge(a.getChoice(), 1, Integer::sum));
+      return counter.values().stream()
+          .map(value -> (value.doubleValue() / answers.size()) * 100)
+          .toArray(Number[]::new);
+    }
+  }
 }

@@ -36,11 +36,11 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public void updateQuestion(Game game, Question question, Question newQuestion) {
+  public void updateQuestion(Question question, String newText) {
     JpaEntityManagerProvider.getEntityManager()
-        .createQuery("update Question as q set q.id = :newQuestionId, q.text = :newText")
-        .setParameter("newQuestionId", newQuestion.getId())
-        .setParameter("newText", newQuestion.getText())
+        .createQuery("update Question as q set q.text = :newText where q.id = :questionId")
+        .setParameter("newText", newText)
+        .setParameter("questionId", question.getId())
         .executeUpdate();
     commit();
     clearCache();

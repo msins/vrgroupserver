@@ -19,7 +19,7 @@ public interface Dao {
 
   void removeQuestion(Question question);
 
-  void updateQuestion(Game game, Question question, Question newQuestion);
+  void updateQuestion(Question question, String newQuestion);
 
   int getQuestionsCount(Game game);
 
