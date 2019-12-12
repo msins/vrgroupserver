@@ -39,6 +39,10 @@ public class NewQuestionForm extends Dialog {
         layout.removeAll();
         form = new MultipleChoicesQuestionForm();
         layout.add(form);
+      } else if (select.getValue() == Type.SCALING_QUESTION) {
+        layout.removeAll();
+        form = new MultipleChoicesQuestionForm();
+        layout.add(form);
       }
     });
 
@@ -50,8 +54,7 @@ public class NewQuestionForm extends Dialog {
         return;
       }
 
-      if (select.getValue() == Type.MULTIPLE_CHOICE) {
-        MultipleChoicesQuestionForm f = ((MultipleChoicesQuestionForm) form);
+      MultipleChoicesQuestionForm f = ((MultipleChoicesQuestionForm) form);
 
         boolean hasError = false;
         if (f.getText().getValue().trim().isEmpty()) {
@@ -82,7 +85,7 @@ public class NewQuestionForm extends Dialog {
 
         if (!hasError) {
           IndexedChoice[] indexedChoices = f.getChoicesValues();
-          Question newQuestion = new Question(f.getText().getValue(), Type.MULTIPLE_CHOICE);
+          Question newQuestion = new Question(f.getText().getValue(), select.getValue());
           List<Choice> choices = Arrays.stream(indexedChoices)
               .map(c -> new Choice(newQuestion, c.getValue(), c.getIndex()))
               .sorted()
@@ -92,7 +95,6 @@ public class NewQuestionForm extends Dialog {
           onCreate.accept(newQuestion);
           close();
         }
-      }
     });
     createBtn.addClickShortcut(Key.ENTER);
 

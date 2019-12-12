@@ -82,7 +82,8 @@ public class Question implements Serializable, Comparable<Question> {
   }
 
   public enum Type {
-    MULTIPLE_CHOICE("Multiple choices");
+    MULTIPLE_CHOICE("Multiple choices"),
+    SCALING_QUESTION("Scaling question");
 
     @Column(name = "name")
     private String name;
