@@ -1,3 +1,5 @@
-Run using `mvn jetty:run` and open [http://localhost:8080](http://localhost:8080) in the browser.
+App used for managing surveys for different games, scenarios, questions through admin dashboard and storing them into database.
+Also contains rest api for retrieving info for given game.
+Made in Vaadin(dogshit framework), Hibernate, Jersey.
 
-If you want to run your app locally in the production mode, run `mvn jetty:run -Pproduction`.
+For testing, run using `mvn jetty:run` and open [http://localhost:8080](http://localhost:8080)

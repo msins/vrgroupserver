@@ -9,21 +9,16 @@
   <packaging>war</packaging>
 
   <properties>
-    <maven.compiler.source>1.11</maven.compiler.source>
-    <maven.compiler.target>1.11</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <failOnMissingWebXml>false</failOnMissingWebXml>
 
     <vaadin.version>14.0.12</vaadin.version>
-
-    <drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
   </properties>
 
   <repositories>
-    <!-- The order of definitions matters. Explicitly defining central here to make sure it has the highest priority. -->
-
-    <!-- Main Maven repository -->
     <repository>
       <id>central</id>
       <url>https://repo.maven.apache.org/maven2</url>
@@ -31,15 +26,61 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
-    <!-- Repository used by many Vaadin add-ons -->
+
     <repository>
-      <id>Vaadin Directory</id>
+      <id>vaadin-addons</id>
       <url>https://maven.vaadin.com/vaadin-addons</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
     </repository>
+
+    <repository>
+      <id>vaadin-prereleases</id>
+      <url>https://maven.vaadin.com/vaadin-prereleases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
+    <repository>
+      <id>vaadin-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
   </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>vaadin-prereleases</id>
+      <url>https://maven.vaadin.com/vaadin-prereleases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>vaadin-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 
   <dependencyManagement>
     <dependencies>
@@ -56,7 +97,6 @@
   <dependencies>
     <dependency>
       <groupId>com.vaadin</groupId>
-      <!-- Replace artifactId with vaadin-core to use only free components -->
       <artifactId>vaadin</artifactId>
       <exclusions>
         <exclusion>
@@ -231,7 +271,10 @@
     </plugins>
   </build>
 
+
   <profiles>
+
+
     <profile>
       <id>production</id>
       <properties>
@@ -254,9 +297,9 @@
             <executions>
               <execution>
                 <goals>
-                  <goal>prepare-frontend</goal>
                   <goal>build-frontend</goal>
                 </goals>
+                <phase>compile</phase>
               </execution>
             </executions>
           </plugin>
@@ -315,6 +358,7 @@
               <systemPropertyVariables>
                 <!-- Pass location of downloaded webdrivers to the tests -->
                 <webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
+                <com.vaadin.testbench.Parameters.runLocally>chrome</com.vaadin.testbench.Parameters.runLocally>
               </systemPropertyVariables>
             </configuration>
           </plugin>
@@ -324,8 +368,7 @@
             <artifactId>driver-binary-downloader-maven-plugin</artifactId>
             <version>1.0.17</version>
             <configuration>
-              <onlyGetDriversForHostOperatingSystem>true
-              </onlyGetDriversForHostOperatingSystem>
+              <onlyGetDriversForHostOperatingSystem>true</onlyGetDriversForHostOperatingSystem>
               <rootStandaloneServerDirectory>
                 ${project.basedir}/drivers/driver
               </rootStandaloneServerDirectory>
