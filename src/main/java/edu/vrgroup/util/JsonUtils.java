@@ -10,18 +10,22 @@ public final class JsonUtils {
   }
 
 
-  private static Gson getCustomizedGson() {
+  private static Gson getWritingGson() {
     return new GsonBuilder()
         .excludeFieldsWithoutExposeAnnotation()
         .setPrettyPrinting()
         .create();
   }
 
+  private static Gson getReadingGson() {
+    return new GsonBuilder().create();
+  }
+
   public static <T> T fromJson(String json, Type type) {
-    return getCustomizedGson().fromJson(json, type);
+    return getReadingGson().fromJson(json, type);
   }
 
   public static String toJson(Object src) {
-    return getCustomizedGson().toJson(src);
+    return getWritingGson().toJson(src);
   }
 }

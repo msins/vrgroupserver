@@ -1,5 +1,6 @@
 package edu.vrgroup.rest;
 
+import com.google.common.base.MoreObjects;
 import com.google.gson.annotations.Expose;
 import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Answer;
@@ -79,15 +80,26 @@ public class GamesService {
     return Response.status(201).entity("Successfully added to db.").build();
   }
 
+
   /**
    * Answer received.
    */
-  private static class AnswerResponse {
+  public static class AnswerResponse {
 
     private User user;
     private Scenario scenario;
     private Question question;
     private Choice choice;
+
+    @Override
+    public String toString() {
+      return MoreObjects.toStringHelper(this)
+          .add("user", user)
+          .add("scenario", scenario)
+          .add("question", question)
+          .add("choice", choice)
+          .toString();
+    }
   }
 
   /**
@@ -124,6 +136,7 @@ public class GamesService {
 
     static boolean addAnswer(Game game, Scenario scenario, Question question, Choice choice, User user, String IPv4) {
       try {
+        DaoProvider.getDao().addUser(user);
         DaoProvider.getDao().addAnswer(game, scenario, question, choice, user, Timestamp.from(Instant.now()), IPv4);
       } catch (Exception e) {
         return false;

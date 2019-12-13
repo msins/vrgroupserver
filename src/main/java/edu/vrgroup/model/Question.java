@@ -1,5 +1,6 @@
 package edu.vrgroup.model;
 
+import com.google.common.base.MoreObjects;
 import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.List;
@@ -124,4 +125,13 @@ public class Question implements Serializable, Comparable<Question> {
     return this.text.compareTo(other.text);
   }
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("id", id)
+        .add("text", text)
+        .add("choices", choices)
+        .add("type", type)
+        .toString();
+  }
 }
