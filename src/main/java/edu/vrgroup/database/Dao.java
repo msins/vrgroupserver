@@ -6,10 +6,8 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.model.User;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 
 public interface Dao {
 
@@ -53,6 +51,8 @@ public interface Dao {
   int getAnswersCount(Game game, Scenario scenario, Question question);
 
   void addUser(User user);
+
   void addScenario(Scenario scenario);
+
   Scenario getDefaultScenario();
 }

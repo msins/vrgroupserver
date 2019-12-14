@@ -21,9 +21,9 @@
       <property name="hibernate.connection.url"
         value="jdbc:mysql://localhost/vrserver?useUnicode=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=GMT&amp;autoReconnect=true"/>
 
-      <!--            todo proper security for rest server -->
-      <property name="hibernate.connection.username" value="root"/>
-      <property name="hibernate.connection.password" value="root"/>
+      <!--      Edit this after you clone repository to match your db username/password-->
+      <property name="hibernate.connection.username" value="username"/>
+      <property name="hibernate.connection.password" value="password"/>
 
       <property name="hibernate.connection.CharSet" value="utf8"/>
       <property name="hibernate.connection.characterEncoding" value="utf8"/>

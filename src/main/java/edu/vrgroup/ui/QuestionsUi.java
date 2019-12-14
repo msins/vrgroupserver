@@ -4,14 +4,13 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
-import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.PageTitle;
@@ -25,16 +24,13 @@ import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
-import edu.vrgroup.rest.GamesService.AnswerResponse;
+import edu.vrgroup.ui.providers.AnswersGridDataProvider;
+import edu.vrgroup.ui.providers.QuestionsProvider;
 import edu.vrgroup.ui.util.ButtonFactory;
-import edu.vrgroup.util.JsonUtils;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 @Route(value = "questions", layout = MainAppUi.class)
 @PageTitle("Questions")
@@ -72,6 +68,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
         e -> new NewQuestionForm(game, question -> questions.getDataProvider().refreshAll()).open()) {{
       setWidthFull();
     }};
+
     add(new VerticalLayout(button, questions) {{
       setMaxWidth("25%");
       setMinWidth("25%");
@@ -110,25 +107,6 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
     scenarioNotifier.registerListener(this);
   }
 
-  private static class QuestionsProvider extends AbstractBackEndDataProvider<Question, Object> {
-
-    private Game game;
-
-    public QuestionsProvider(Game game) {
-      this.game = game;
-    }
-
-    @Override
-    protected Stream<Question> fetchFromBackEnd(Query<Question, Object> query) {
-      return DaoProvider.getDao().getQuestions(game).stream();
-    }
-
-    @Override
-    protected int sizeInBackEnd(Query<Question, Object> query) {
-      return DaoProvider.getDao().getQuestionsCount(game);
-    }
-  }
-
   private static class Questions extends ListBox<Question> {
 
     {
@@ -149,7 +127,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
   private static class QuestionView extends VerticalLayout {
 
     private ResultChart<Question> chart;
-    private AnswersGrid grid;
+    private Grid<Answer> grid;
     private Game game;
     private Scenario scenario;
     private Question question;
@@ -177,38 +155,14 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
 
     private void initUi() {
       chart = new ResultChart<>(question);
-
-      grid = new AnswersGrid();
       chart.setWidthFull();
+
+      grid = new QuestionAnswerGrid(game, scenario, question);
       grid.setWidthFull();
-      grid.addColumn(a -> a.getTimestamp().toLocalDateTime()
-          .format(DateTimeFormatter.ofPattern("d.MM.yyyy. HH:mm:ss")))
-          .setHeader(new Html("<b>Time</b>"));
-      grid.addColumn(
-          TemplateRenderer.<Answer>of("<div>[[item.user.name]]<b>[</b>[[item.IPv4]]<b>]</b></div>")
-              .withProperty("user", Answer::getUser)
-              .withProperty("IPv4", Answer::getIPv4))
-          .setHeader(new Html("<b>User</b>"));
-      grid.addColumn(Answer::getChoice)
-          .setHeader(new Html("<b>Score</b>"));
-
-      grid.getColumns().forEach(e -> e.setAutoWidth(true));
-      grid.getColumns().forEach(e -> e.setSortable(true));
-      grid.setDataProvider(new AbstractBackEndDataProvider<>() {
-        @Override
-        protected Stream<Answer> fetchFromBackEnd(Query<Answer, Object> query) {
-          return DaoProvider.getDao().getAnswers(game, scenario, question, query.getOffset(), query.getLimit())
-              .stream();
-        }
-
-        @Override
-        protected int sizeInBackEnd(Query<Answer, Object> query) {
-          return DaoProvider.getDao().getAnswersCount(game, scenario, question);
-        }
-      });
 
       VerticalLayout layout = new VerticalLayout();
       layout.setAlignItems(Alignment.CENTER);
+
       HorizontalLayout gridChart = new HorizontalLayout(grid, chart);
       gridChart.setWidthFull();
       layout.add(gridChart);
@@ -231,6 +185,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
         removeAll();
         notifier.refreshAll();
       });
+
       Button sync = ButtonFactory.createGreenButton("Sync",
           e -> {
             DaoProvider.getDao().updateQuestion(question, text.getValue());
@@ -244,7 +199,6 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
     }
   }
 
-
   private static final class QuestionStatistics {
 
     public static Number[] get(List<Answer> answers, Question question) {
@@ -254,6 +208,36 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       return counter.values().stream()
           .map(value -> (value.doubleValue() / answers.size()) * 100)
           .toArray(Number[]::new);
+    }
+  }
+
+  private static class QuestionAnswerGrid extends AnswersGrid {
+
+    private Game game;
+    private Scenario scenario;
+    private Question question;
+
+    public QuestionAnswerGrid(Game game, Scenario scenario, Question question) {
+      this.game = game;
+      this.scenario = scenario;
+      this.question = question;
+    }
+
+    private void initUi() {
+      addColumn(a -> a.getTimestamp().toLocalDateTime()
+          .format(DateTimeFormatter.ofPattern("d.MM.yyyy. HH:mm:ss")))
+          .setHeader(new Html("<b>Time</b>"));
+      addColumn(
+          TemplateRenderer.<Answer>of("<div>[[item.user.name]]<b>[</b>[[item.IPv4]]<b>]</b></div>")
+              .withProperty("user", Answer::getUser)
+              .withProperty("IPv4", Answer::getIPv4))
+          .setHeader(new Html("<b>User</b>"));
+      addColumn(Answer::getChoice)
+          .setHeader(new Html("<b>Score</b>"));
+
+      getColumns().forEach(e -> e.setAutoWidth(true));
+      getColumns().forEach(e -> e.setSortable(true));
+      setDataProvider(new AnswersGridDataProvider(game, scenario, question));
     }
   }
 }

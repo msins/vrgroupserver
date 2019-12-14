@@ -4,7 +4,6 @@ import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.DetachEvent;
 import com.vaadin.flow.component.HasComponents;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
@@ -17,8 +16,6 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.Tabs.Orientation;
-import com.vaadin.flow.data.provider.AbstractBackEndDataProvider;
-import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
@@ -27,10 +24,10 @@ import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.communication.PushMode;
 import edu.vrgroup.GameChangeListener;
 import edu.vrgroup.GameChangeNotifier;
-import edu.vrgroup.model.Game;
 import edu.vrgroup.database.DaoProvider;
+import edu.vrgroup.model.Game;
+import edu.vrgroup.ui.providers.GameDataProvider;
 import edu.vrgroup.util.SecurityUtils;
-import java.util.stream.Stream;
 
 @Route("")
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
@@ -109,17 +106,7 @@ public class MainAppUi extends AppLayout implements GameChangeListener {
   private static Select<Game> createGamesList() {
     Select<Game> games = new Select<>();
     games.setPlaceholder("Select a game");
-    games.setDataProvider(new AbstractBackEndDataProvider<>() {
-      @Override
-      protected Stream<Game> fetchFromBackEnd(Query<Game, Object> query) {
-        return DaoProvider.getDao().getGames().stream();
-      }
-
-      @Override
-      protected int sizeInBackEnd(Query<Game, Object> query) {
-        return DaoProvider.getDao().getGamesCount();
-      }
-    });
+    games.setDataProvider(new GameDataProvider());
     return games;
   }
 

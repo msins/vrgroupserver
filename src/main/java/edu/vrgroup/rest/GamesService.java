@@ -1,9 +1,6 @@
 package edu.vrgroup.rest;
 
-import com.google.common.base.MoreObjects;
-import com.google.gson.annotations.Expose;
 import edu.vrgroup.database.DaoProvider;
-import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
@@ -12,11 +9,6 @@ import edu.vrgroup.model.User;
 import edu.vrgroup.util.JsonUtils;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeSet;
-import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -61,7 +53,7 @@ public class GamesService {
   @POST
   @Path("{game}")
   @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.TEXT_PLAIN)
   public Response submitUserAnswerToDb(@PathParam("game") String name, String body) {
 
     logger.log(Level.INFO, "POST [" + request.getRemoteAddr() + "] " + name);
@@ -78,53 +70,6 @@ public class GamesService {
     }
 
     return Response.status(201).entity("Successfully added to db.").build();
-  }
-
-  /**
-   * Answer received.
-   */
-  public static class AnswerResponse {
-
-    public User user;
-    public Scenario scenario;
-    public Question question;
-    public Choice choice;
-
-    @Override
-    public String toString() {
-      return MoreObjects.toStringHelper(this)
-          .add("user", user)
-          .add("scenario", scenario)
-          .add("question", question)
-          .add("choice", choice)
-          .toString();
-    }
-  }
-
-  /**
-   * Response given.
-   */
-  private static class GameResponse {
-
-    @Expose
-    private List<Scenario> scenarios;
-
-    @Expose
-    private List<Question> questions;
-
-    private Game game;
-
-    public GameResponse(Game game) {
-      this.game = game;
-    }
-
-    public void get() {
-      questions = DaoProvider.getDao().getQuestions(game);
-      for (Question question : questions) {
-        Collections.sort(question.getChoices());
-      }
-      scenarios = List.of(Scenario.DEFAULT);
-    }
   }
 
   private static final class DaoHelper {
