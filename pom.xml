@@ -231,17 +231,12 @@
           <target>11</target>
         </configuration>
       </plugin>
-      <!-- Jetty plugin for easy testing without a server -->
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
         <version>9.4.19.v20190610</version>
         <configuration>
-          <!-- If using IntelliJ IDEA with autocompilation, this
-          might cause lots of unnecessary compilations in the
-          background.-->
-          <scanIntervalSeconds>10</scanIntervalSeconds>
-          <!-- Use war output directory to get the webpack files -->
+          <scanIntervalSeconds>0</scanIntervalSeconds>
           <httpConnector>
             <port>8080</port>
           </httpConnector>
@@ -251,11 +246,6 @@
         </configuration>
       </plugin>
 
-      <!--
-          Take care of synchronizing java dependencies and imports in
-          package.json and main.js files.
-          It also creates webpack.config.js if not exists yet.
-      -->
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-maven-plugin</artifactId>
@@ -271,10 +261,7 @@
     </plugins>
   </build>
 
-
   <profiles>
-
-
     <profile>
       <id>production</id>
       <properties>
@@ -339,7 +326,6 @@
             </executions>
           </plugin>
 
-          <!-- Runs the integration tests (*IT) after the server is started -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -356,7 +342,6 @@
               <trimStackTrace>false</trimStackTrace>
               <enableAssertions>true</enableAssertions>
               <systemPropertyVariables>
-                <!-- Pass location of downloaded webdrivers to the tests -->
                 <webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
                 <com.vaadin.testbench.Parameters.runLocally>chrome</com.vaadin.testbench.Parameters.runLocally>
               </systemPropertyVariables>
@@ -381,7 +366,6 @@
             </configuration>
             <executions>
               <execution>
-                <!-- use phase "none" to skip download step -->
                 <phase>${drivers.downloader.phase}</phase>
                 <goals>
                   <goal>selenium</goal>

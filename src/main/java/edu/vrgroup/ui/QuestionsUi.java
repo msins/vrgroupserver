@@ -30,7 +30,6 @@ import edu.vrgroup.ui.util.ButtonFactory;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -209,7 +208,8 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       });
 
       add(new Button("Generate answer", e -> {
-        User user = new User("Marko", "m.sinko" + ThreadLocalRandom.current().nextInt() + "@hotmail.com");
+        User user = new User("Marko", "m.sinko" + ThreadLocalRandom.current().nextInt() + "@hotmail.com", "M",
+            ThreadLocalRandom.current().nextInt(18, 64));
         DaoProvider.getDao().addUser(user);
         DaoProvider.getDao().addAnswer(
             game,

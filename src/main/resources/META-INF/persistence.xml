@@ -19,7 +19,7 @@
       <property name="hibernate.jdbc.use_get_generated_keys" value="true"/>
       <property name="hibernate.connection.driver_class" value="com.mysql.cj.jdbc.Driver"/>
       <property name="hibernate.connection.url"
-        value="jdbc:mysql://localhost/vrserver?useUnicode=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=GMT"/>
+        value="jdbc:mysql://localhost/vrserver?useUnicode=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=GMT&amp;autoReconnect=true"/>
 
       <!--            todo proper security for rest server -->
       <property name="hibernate.connection.username" value="root"/>
