@@ -7,6 +7,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -16,6 +18,8 @@ public class Choice implements Serializable, Comparable<Choice> {
 
   @Id
   @Column(name = "id")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Expose
   private Integer id;
 
   @ManyToOne
@@ -36,7 +40,6 @@ public class Choice implements Serializable, Comparable<Choice> {
   }
 
   public Choice(Question question, String value, Integer order) {
-    this.id = value.hashCode() ^ ThreadLocalRandom.current().nextInt();
     this.question = question;
     this.value = value;
     this.order = order;

@@ -72,6 +72,7 @@ public class GamesService {
     }
 
     AnswerResponse r = JsonUtils.fromJson(body, AnswerResponse.class);
+    System.out.println(r);
 
     if (!DaoHelper.addAnswer(game, r.scenario, r.question, r.choice, r.user, request.getRemoteAddr())) {
       return Response.status(503).entity("Problem with server.").build();
@@ -80,16 +81,15 @@ public class GamesService {
     return Response.status(201).entity("Successfully added to db.").build();
   }
 
-
   /**
    * Answer received.
    */
   public static class AnswerResponse {
 
-    private User user;
-    private Scenario scenario;
-    private Question question;
-    private Choice choice;
+    public User user;
+    public Scenario scenario;
+    public Question question;
+    public Choice choice;
 
     @Override
     public String toString() {

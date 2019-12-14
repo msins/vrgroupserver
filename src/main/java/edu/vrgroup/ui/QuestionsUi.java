@@ -26,7 +26,9 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.model.User;
+import edu.vrgroup.rest.GamesService.AnswerResponse;
 import edu.vrgroup.ui.util.ButtonFactory;
+import edu.vrgroup.util.JsonUtils;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -208,17 +210,48 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       });
 
       add(new Button("Generate answer", e -> {
-        User user = new User("Marko", "m.sinko" + ThreadLocalRandom.current().nextInt() + "@hotmail.com", "M",
-            ThreadLocalRandom.current().nextInt(18, 64));
-        DaoProvider.getDao().addUser(user);
-        DaoProvider.getDao().addAnswer(
-            game,
-            scenario,
-            question,
-            question.getChoices().get(ThreadLocalRandom.current().nextInt(question.getChoices().size())),
-            user,
-            Timestamp.from(Instant.now()),
-            "127.0.0.1");
+        String json = "{\n"
+            + "  \"scenarios\": [\n"
+            + "    {\n"
+            + "      \"id\": 1,\n"
+            + "      \"name\": \"Default\"\n"
+            + "    }\n"
+            + "  ],\n"
+            + "  \"questions\": [\n"
+            + "    {\n"
+            + "      \"id\": 2,\n"
+            + "      \"text\": \"Rate the game\",\n"
+            + "      \"choices\": [\n"
+            + "        {\n"
+            + "          \"id\": 1,\n"
+            + "          \"value\": \"Bad\"\n"
+            + "        },\n"
+            + "        {\n"
+            + "          \"id\": 2,\n"
+            + "          \"value\": \"Good\"\n"
+            + "        },\n"
+            + "        {\n"
+            + "          \"id\": 3,\n"
+            + "          \"value\": \"Great\"\n"
+            + "        }\n"
+            + "      ],\n"
+            + "      \"type\": \"MULTIPLE_CHOICE\"\n"
+            + "    }\n"
+            + "  ]\n"
+            + "}";
+        AnswerResponse r = JsonUtils.fromJson(json, AnswerResponse.class);
+        DaoProvider.getDao().addUser(r.user);
+        DaoProvider.getDao().addAnswer(game, r.scenario, r.question, r.choice, r.user, Timestamp.from(Instant.now()), "127.0.01");
+//        User user = new User("Marko", "m.sinko" + ThreadLocalRandom.current().nextInt() + "@hotmail.com", "M",
+//            ThreadLocalRandom.current().nextInt(18, 64));
+//        DaoProvider.getDao().addAnswer(
+//            game,
+//            scenario,
+//            question,
+//            question.getChoices().get(ThreadLocalRandom.current().nextInt(question.getChoices().size())),
+//            user,
+//            Timestamp.from(Instant.now()),
+//            "127.0.0.1");
       }));
 
       VerticalLayout layout = new VerticalLayout();

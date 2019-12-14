@@ -1,13 +1,13 @@
 create table Game
 (
-    id   int          not null
+    id   int auto_increment
         primary key,
     name varchar(200) not null
 );
 
 create table Question
 (
-    id   int          not null
+    id   int auto_increment
         primary key,
     text varchar(300) not null
 );
@@ -27,7 +27,7 @@ create table GameQuestion
 
 create table Choice
 (
-     id         int                      not null
+    id         int auto_increment
         primary key,
     questionId int                      not null,
     orderValue int                      not null,
@@ -39,7 +39,7 @@ create table Choice
 
 create table Scenario
 (
-    id   int         not null
+    id   int auto_increment
         primary key,
     name varchar(50) not null
 );
@@ -53,7 +53,7 @@ create table GameScenario
 
 create table User
 (
-    id     int         not null
+    id     int auto_increment
         primary key,
     name   varchar(50) not null,
     email  varchar(50) null,
@@ -87,6 +87,4 @@ create table Answer
 --         foreign key (choiceId) references Choice (id)
 --             on update cascade
 );
-
-insert into Scenario values(0, 'Default');
 

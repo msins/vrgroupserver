@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
@@ -15,6 +17,7 @@ public class Scenario implements Serializable, Comparable<Scenario> {
 
   @Id
   @Expose
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
   @Column
@@ -25,7 +28,6 @@ public class Scenario implements Serializable, Comparable<Scenario> {
   }
 
   public Scenario(String name) {
-    this.id = name.hashCode() ^ ThreadLocalRandom.current().nextInt();
     this.name = name;
   }
 
