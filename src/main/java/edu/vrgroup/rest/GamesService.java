@@ -72,7 +72,6 @@ public class GamesService {
     }
 
     AnswerResponse r = JsonUtils.fromJson(body, AnswerResponse.class);
-    System.out.println(r);
 
     if (!DaoHelper.addAnswer(game, r.scenario, r.question, r.choice, r.user, request.getRemoteAddr())) {
       return Response.status(503).entity("Problem with server.").build();
