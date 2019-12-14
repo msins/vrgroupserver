@@ -25,7 +25,6 @@ import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
-import edu.vrgroup.model.User;
 import edu.vrgroup.rest.GamesService.AnswerResponse;
 import edu.vrgroup.ui.util.ButtonFactory;
 import edu.vrgroup.util.JsonUtils;
@@ -35,7 +34,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Stream;
 
 @Route(value = "questions", layout = MainAppUi.class)
@@ -75,8 +73,8 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       setWidthFull();
     }};
     add(new VerticalLayout(button, questions) {{
-      setMaxWidth("30%");
-      setMinWidth("30%");
+      setMaxWidth("25%");
+      setMinWidth("25%");
     }});
   }
 
@@ -208,51 +206,6 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
           return DaoProvider.getDao().getAnswersCount(game, scenario, question);
         }
       });
-
-      add(new Button("Generate answer", e -> {
-        String json = "{\n"
-            + "  \"scenarios\": [\n"
-            + "    {\n"
-            + "      \"id\": 1,\n"
-            + "      \"name\": \"Default\"\n"
-            + "    }\n"
-            + "  ],\n"
-            + "  \"questions\": [\n"
-            + "    {\n"
-            + "      \"id\": 2,\n"
-            + "      \"text\": \"Rate the game\",\n"
-            + "      \"choices\": [\n"
-            + "        {\n"
-            + "          \"id\": 1,\n"
-            + "          \"value\": \"Bad\"\n"
-            + "        },\n"
-            + "        {\n"
-            + "          \"id\": 2,\n"
-            + "          \"value\": \"Good\"\n"
-            + "        },\n"
-            + "        {\n"
-            + "          \"id\": 3,\n"
-            + "          \"value\": \"Great\"\n"
-            + "        }\n"
-            + "      ],\n"
-            + "      \"type\": \"MULTIPLE_CHOICE\"\n"
-            + "    }\n"
-            + "  ]\n"
-            + "}";
-        AnswerResponse r = JsonUtils.fromJson(json, AnswerResponse.class);
-        DaoProvider.getDao().addUser(r.user);
-        DaoProvider.getDao().addAnswer(game, r.scenario, r.question, r.choice, r.user, Timestamp.from(Instant.now()), "127.0.01");
-//        User user = new User("Marko", "m.sinko" + ThreadLocalRandom.current().nextInt() + "@hotmail.com", "M",
-//            ThreadLocalRandom.current().nextInt(18, 64));
-//        DaoProvider.getDao().addAnswer(
-//            game,
-//            scenario,
-//            question,
-//            question.getChoices().get(ThreadLocalRandom.current().nextInt(question.getChoices().size())),
-//            user,
-//            Timestamp.from(Instant.now()),
-//            "127.0.0.1");
-      }));
 
       VerticalLayout layout = new VerticalLayout();
       layout.setAlignItems(Alignment.CENTER);

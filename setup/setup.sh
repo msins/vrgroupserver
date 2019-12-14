@@ -14,4 +14,4 @@ sudo mysql_secure_installation
 read -p 'Username (used for login): ' username
 read -sp 'Password (used for login): ' password
 mysql -u root -e "create database vrserver; GRANT ALL PRIVILEGES ON vrserver.* to '$username'@localhost IDENTIFIED BY '$password';"
-mysql -h localhost -u '$username' --password='$password' vrserver < ${directory}/vrgroupserver/setup/init.sql
+mysql -h localhost -u '$username' --password='$password' vrserver < ~/vrgroupserver/setup/init.sql

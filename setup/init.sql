@@ -88,3 +88,4 @@ create table Answer
 --             on update cascade
 );
 
+insert into Scenario values(1, 'Default');
