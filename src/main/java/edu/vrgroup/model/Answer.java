@@ -12,7 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Answer<T extends Question> implements Serializable, Comparable<Answer> {
+public class Answer implements Serializable, Comparable<Answer> {
 
   @Id
   @Column(name = "timestampCreated")
@@ -23,7 +23,7 @@ public class Answer<T extends Question> implements Serializable, Comparable<Answ
   @JoinColumn(name = "questionId", nullable = false, foreignKey = @ForeignKey(
       foreignKeyDefinition = "FOREIGN KEY (questionId) REFERENCES Question(id) ON DELETE CASCADE ON UPDATE CASCADE"
   ))
-  private T question;
+  private Question question;
 
   @Id
   @ManyToOne(targetEntity = Scenario.class)
@@ -59,7 +59,7 @@ public class Answer<T extends Question> implements Serializable, Comparable<Answ
   public Answer() {
   }
 
-  public Answer(Timestamp timestamp, T question, Scenario scenario, Game game, User user, Choice choice,
+  public Answer(Timestamp timestamp, Question question, Scenario scenario, Game game, User user, Choice choice,
       String IPv4) {
     this.timestamp = timestamp;
     this.question = question;
@@ -78,11 +78,11 @@ public class Answer<T extends Question> implements Serializable, Comparable<Answ
     this.timestamp = timestamp;
   }
 
-  public T getQuestion() {
+  public Question getQuestion() {
     return question;
   }
 
-  public void setQuestion(T question) {
+  public void setQuestion(Question question) {
     this.question = question;
   }
 
@@ -146,7 +146,7 @@ public class Answer<T extends Question> implements Serializable, Comparable<Answ
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Answer<?> answer = (Answer<?>) o;
+    Answer answer = (Answer) o;
     return timestamp.equals(answer.timestamp) &&
         question.equals(answer.question) &&
         scenario.equals(answer.scenario) &&

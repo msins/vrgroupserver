@@ -3,7 +3,6 @@ package edu.vrgroup.model;
 import com.google.gson.annotations.Expose;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,8 +11,6 @@ import javax.persistence.Id;
 
 @Entity
 public class Scenario implements Serializable, Comparable<Scenario> {
-
-  public static Scenario DEFAULT;
 
   @Id
   @Expose

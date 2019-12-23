@@ -3,10 +3,10 @@ package edu.vrgroup.database;
 import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
-import edu.vrgroup.model.GameQuestion;
 import edu.vrgroup.model.GameScenario;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
+import edu.vrgroup.model.ScenarioQuestion;
 import edu.vrgroup.model.User;
 import java.sql.Timestamp;
 import java.util.List;
@@ -16,22 +16,22 @@ import javax.persistence.NoResultException;
 public class JpaDaoImpl implements Dao {
 
   @Override
-  public List<Question> getQuestions(Game game) {
+  public List<Question> getQuestions(Scenario scenario) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
-            "select q from Question as q, GameQuestion as gq where q.id = gq.question.id and gq.game.id = :gameId",
+            "select q from Question as q, ScenarioQuestion as sq where q.id = sq.question.id and sq.scenario.id = :scenarioId",
             Question.class)
-        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
         .getResultList();
   }
 
   @Override
-  public void addQuestion(Game game, Question question) {
+  public void addQuestion(Scenario scenario, Question question) {
     JpaEntityManagerProvider.getEntityManager().persist(question);
     for (var choice : question.getChoices()) {
       JpaEntityManagerProvider.getEntityManager().persist(choice);
     }
-    JpaEntityManagerProvider.getEntityManager().persist(new GameQuestion(game, question));
+    JpaEntityManagerProvider.getEntityManager().persist(new ScenarioQuestion(scenario, question));
     commit();
   }
 
@@ -56,12 +56,12 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public int getQuestionsCount(Game game) {
+  public int getQuestionsCount(Scenario scenario) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
-            "select count(*) from Question as q, GameQuestion as gq where q.id = gq.question.id and gq.game.id = :gameId",
+            "select count(*) from Question as q, ScenarioQuestion as sq where q.id = sq.question.id and sq.scenario.id = :scenarioId",
             Long.class)
-        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
         .getSingleResult().intValue();
   }
 
@@ -103,7 +103,9 @@ public class JpaDaoImpl implements Dao {
   @Override
   public void addGame(Game game) {
     JpaEntityManagerProvider.getEntityManager().persist(game);
-    JpaEntityManagerProvider.getEntityManager().persist(new GameScenario(game, Scenario.DEFAULT));
+    Scenario defaultScenario = new Scenario("Default");
+    JpaEntityManagerProvider.getEntityManager().persist(defaultScenario);
+    JpaEntityManagerProvider.getEntityManager().persist(new GameScenario(game, defaultScenario));
     commit();
   }
 
@@ -196,7 +198,7 @@ public class JpaDaoImpl implements Dao {
   @Override
   public void addAnswer(Game game, Scenario scenario, Question question, Choice choice, User user, Timestamp timestamp,
       String IPv4) {
-    Answer<Question> answer = new Answer<>(timestamp, question, scenario, game, user, choice, IPv4);
+    Answer answer = new Answer(timestamp, question, scenario, game, user, choice, IPv4);
     JpaEntityManagerProvider.getEntityManager().persist(answer);
     commit();
   }
@@ -208,16 +210,37 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public void addScenario(Scenario scenario) {
+  public void addScenario(Game game, Scenario scenario) {
     JpaEntityManagerProvider.getEntityManager().persist(scenario);
+    JpaEntityManagerProvider.getEntityManager().persist(new GameScenario(game, scenario));
     commit();
   }
 
   @Override
-  public Scenario getDefaultScenario() {
+  public void removeScenario(Scenario scenario) {
+    EntityManager em = JpaEntityManagerProvider.getEntityManager();
+    em.remove(em.contains(scenario) ? scenario : em.merge(scenario));
+    commit();
+  }
+
+  @Override
+  public int getScenarioCount(Game game) {
     return JpaEntityManagerProvider.getEntityManager()
-        .createQuery("select s from Scenario as s where s.name='Default'", Scenario.class)
-        .getSingleResult();
+        .createQuery(
+            "select count(*) from Scenario as scenario, GameScenario as gs where scenario.id = gs.scenario.id and gs.game.id = :gameId",
+            Long.class)
+        .setParameter("gameId", game.getId())
+        .getSingleResult().intValue();
+  }
+
+  @Override
+  public List<Scenario> getScenarios(Game game) {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery(
+            "select scenario from Scenario as scenario, GameScenario as gs where scenario.id = gs.scenario.id and gs.game.id=:gameId",
+            Scenario.class)
+        .setParameter("gameId", game.getId())
+        .getResultList();
   }
 
   private void clearCache() {

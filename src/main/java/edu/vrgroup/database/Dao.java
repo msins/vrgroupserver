@@ -11,15 +11,15 @@ import java.util.List;
 
 public interface Dao {
 
-  List<Question> getQuestions(Game game);
+  List<Question> getQuestions(Scenario scenario);
 
-  void addQuestion(Game game, Question question);
+  void addQuestion(Scenario scenario, Question question);
 
   void removeQuestion(Question question);
 
   void updateQuestion(Question question, String newQuestion);
 
-  int getQuestionsCount(Game game);
+  int getQuestionsCount(Scenario scenario);
 
   List<Choice> getChoices(Question question);
 
@@ -52,7 +52,11 @@ public interface Dao {
 
   void addUser(User user);
 
-  void addScenario(Scenario scenario);
+  List<Scenario> getScenarios(Game game);
 
-  Scenario getDefaultScenario();
+  int getScenarioCount(Game game);
+
+  void addScenario(Game game, Scenario scenario);
+
+  void removeScenario(Scenario scenario);
 }
