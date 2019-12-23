@@ -1,4 +1,4 @@
-package edu.vrgroup.ui;
+package edu.vrgroup.ui.forms;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -10,15 +10,14 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Choice;
-import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Question.Type;
-import edu.vrgroup.ui.MultipleChoicesQuestionForm.IndexedChoice;
-import edu.vrgroup.ui.util.ButtonFactory;
+import edu.vrgroup.model.Scenario;
+import edu.vrgroup.ui.forms.MultipleChoicesQuestionForm.IndexedChoice;
+import edu.vrgroup.ui.util.AbstractButtonFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -27,7 +26,7 @@ public class NewQuestionForm extends Dialog {
   private VerticalLayout layout;
   private VerticalLayout form;
 
-  public NewQuestionForm(Game game, Consumer<Question> onCreate) {
+  public NewQuestionForm(Scenario scenario, Consumer<Question> onCreate) {
     Select<Question.Type> select = new Select<>(Type.values());
     select.setPlaceholder("Pick question type");
     select.setItemLabelGenerator(Question.Type::getName);
@@ -46,9 +45,9 @@ public class NewQuestionForm extends Dialog {
       }
     });
 
-    Button createBtn = ButtonFactory.createPrimaryButton("Create", e -> {
-      if (game == null) {
-        Notification notification = new Notification("Select a game", 3000);
+    Button createBtn = AbstractButtonFactory.getRectangle().createPrimaryButton("Create", e -> {
+      if (scenario == null) {
+        Notification notification = new Notification("Select a scenario", 3000);
         notification.getElement().getStyle().set("color", "red");
         notification.open();
         return;
@@ -91,14 +90,14 @@ public class NewQuestionForm extends Dialog {
               .sorted()
               .collect(Collectors.toList());
           newQuestion.setChoices(choices);
-          DaoProvider.getDao().addQuestion(game, newQuestion);
+          DaoProvider.getDao().addQuestion(scenario, newQuestion);
           onCreate.accept(newQuestion);
           close();
         }
     });
     createBtn.addClickShortcut(Key.ENTER);
 
-    Button closeBtn = ButtonFactory.createRedButton("Cancel", e -> close());
+    Button closeBtn = AbstractButtonFactory.getRectangle().createRedButton("Cancel", e -> close());
 
     add(new HorizontalLayout(select, createBtn, closeBtn), layout);
   }

@@ -1,4 +1,4 @@
-package edu.vrgroup.ui;
+package edu.vrgroup.ui.forms;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
