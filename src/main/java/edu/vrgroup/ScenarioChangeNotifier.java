@@ -1,17 +1,20 @@
 package edu.vrgroup;
 
-import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Scenario;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class ScenarioChangeNotifier {
 
-  private List<ScenarioChangeListener> listeners = new CopyOnWriteArrayList<>();
+  private Set<ScenarioChangeListener> listeners = new CopyOnWriteArraySet<>();
   private Scenario scenario;
 
   public void registerListener(ScenarioChangeListener listener) {
     listeners.add(listener);
+  }
+
+  public void unregisterListener(ScenarioChangeListener listener) {
+    listeners.remove(listener);
   }
 
   public void setScenario(Scenario scenario) {

@@ -16,6 +16,7 @@ public class GameChangeNotifier {
   public void unregisterListener(GameChangeListener listener) {
     listeners.remove(listener);
   }
+
   public void setGame(Game game) {
     this.game = game;
     for (GameChangeListener l : listeners) {
