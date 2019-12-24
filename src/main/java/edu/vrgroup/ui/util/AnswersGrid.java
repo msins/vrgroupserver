@@ -1,4 +1,4 @@
-package edu.vrgroup.ui;
+package edu.vrgroup.ui.util;
 
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
