@@ -11,6 +11,7 @@ import edu.vrgroup.GameChangeListener;
 import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.ui.providers.DashboardGridAnswersProvider;
+import edu.vrgroup.ui.util.AnswersGrid;
 import java.time.format.DateTimeFormatter;
 
 @Route(value = "dashboard", layout = MainAppUi.class)

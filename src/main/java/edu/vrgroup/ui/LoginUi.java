@@ -10,7 +10,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import edu.vrgroup.DatabaseUtil;
 import edu.vrgroup.util.SecurityUtils;
-import java.sql.SQLException;
 
 @Route("login")
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
@@ -46,6 +45,7 @@ public class LoginUi extends HorizontalLayout implements BeforeEnterObserver {
 
   @Override
   public void beforeEnter(BeforeEnterEvent event) {
+    event.forwardTo(DashboardUi.class);
     if (SecurityUtils.isUserLoggedIn()) {
       event.forwardTo(DashboardUi.class);
     }

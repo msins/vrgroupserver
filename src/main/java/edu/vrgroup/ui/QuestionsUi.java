@@ -17,16 +17,18 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import edu.vrgroup.GameChangeListener;
 import edu.vrgroup.ScenarioChangeListener;
-import edu.vrgroup.ScenarioChangeNotifier;
 import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Answer;
 import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
+import edu.vrgroup.ui.forms.NewQuestionForm;
 import edu.vrgroup.ui.providers.AnswersGridDataProvider;
 import edu.vrgroup.ui.providers.QuestionsProvider;
-import edu.vrgroup.ui.util.ButtonFactory;
+import edu.vrgroup.ui.util.AbstractButtonFactory;
+import edu.vrgroup.ui.util.AnswersGrid;
+import edu.vrgroup.ui.util.ResultChart;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -37,16 +39,15 @@ import java.util.TreeMap;
 public class QuestionsUi extends HorizontalLayout implements GameChangeListener, ScenarioChangeListener {
 
   private Game game;
+  private Scenario scenario;
   private Questions questions;
   private QuestionView questionInformation;
-  private ScenarioChangeNotifier scenarioNotifier = new ScenarioChangeNotifier();
 
   public QuestionsUi() {
-    scenarioNotifier.setScenario(Scenario.DEFAULT);
     questions = new Questions();
 
     if (game != null) {
-      questions.setDataProvider(new QuestionsProvider(game));
+      questions.setDataProvider(new QuestionsProvider(scenario));
     }
     setSizeFull();
 
@@ -55,7 +56,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       if (list.getValue() != null) {
         questionInformation = new QuestionView(
             this.game,
-            scenarioNotifier.getScenario(),
+            this.scenario,
             list.getValue(),
             questions.getDataProvider());
       }
@@ -65,7 +66,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
     });
 
     Button button = new Button("New question", VaadinIcon.PLUS.create(),
-        e -> new NewQuestionForm(game, question -> questions.getDataProvider().refreshAll()).open()) {{
+        e -> new NewQuestionForm(scenario, question -> questions.getDataProvider().refreshAll()).open()) {{
       setWidthFull();
     }};
 
@@ -79,18 +80,22 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
   protected void onAttach(AttachEvent attachEvent) {
     super.onAttach(attachEvent);
     registerToGameNotifier();
+    registerToScenarioNotifier(game);
   }
 
   @Override
   protected void onDetach(DetachEvent detachEvent) {
     super.onDetach(detachEvent);
     unregisterFromGameNotifier();
+    unregisterFromScenarioNotifier(game);
   }
 
   @Override
   public void gameChanged(Game game) {
     this.game = game;
-    questions.setDataProvider(new QuestionsProvider(game));
+    if (scenario != null) {
+      questions.setDataProvider(new QuestionsProvider(scenario));
+    }
     questions.getDataProvider().refreshAll();
     if (questionInformation != null) {
       questionInformation.removeAll();
@@ -99,12 +104,10 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
 
   @Override
   public void scenarioChanged(Scenario scenario) {
-    questionInformation.setScenario(scenario);
-  }
-
-  @Override
-  public void registerToScenarioNotifier() {
-    scenarioNotifier.registerListener(this);
+    this.scenario = scenario;
+    if (questionInformation != null) {
+      questionInformation.setScenario(scenario);
+    }
   }
 
   private static class Questions extends ListBox<Question> {
@@ -180,13 +183,13 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       });
       refresh.click();
 
-      Button delete = ButtonFactory.createRedButton("Delete", e -> {
+      Button delete = AbstractButtonFactory.getRectangle().createRedButton("Delete", e -> {
         DaoProvider.getDao().removeQuestion(question);
         removeAll();
         notifier.refreshAll();
       });
 
-      Button sync = ButtonFactory.createGreenButton("Sync",
+      Button sync = AbstractButtonFactory.getRectangle().createGreenButton("Sync",
           e -> {
             DaoProvider.getDao().updateQuestion(question, text.getValue());
             notifier.refreshAll();
