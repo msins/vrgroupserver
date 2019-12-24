@@ -33,7 +33,7 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.ui.forms.NewScenarioForm;
 import edu.vrgroup.ui.util.DynamicSelect;
-import edu.vrgroup.ui.util.DynamicSelect.ExpandedSelectListener;
+import edu.vrgroup.ui.util.DynamicSelect.DynamicSelectListener;
 import edu.vrgroup.ui.forms.NewGameForm;
 import edu.vrgroup.ui.providers.GameDataProvider;
 import edu.vrgroup.ui.providers.ScenarioDataProvider;
@@ -52,7 +52,7 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
   DynamicSelect<Scenario> scenarioSelect;
 
   public MainAppUi() {
-    scenarioSelect = new DynamicSelect<>(new ScenarioExpandedSelectListener());
+    scenarioSelect = new DynamicSelect<>(new ScenarioDynamicSelectListener());
     scenarioSelect.setPlaceholder("Select scenario");
 
     gameSelect = new DynamicSelect<>(new GameSelectListener());
@@ -138,7 +138,7 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
     scenarioSelect.setValue(scenario);
   }
 
-  private class ScenarioExpandedSelectListener implements ExpandedSelectListener<Scenario> {
+  private class ScenarioDynamicSelectListener implements DynamicSelectListener<Scenario> {
 
     @Override
     public void onRemove(Scenario scenario) {
@@ -195,7 +195,7 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
     }
   }
 
-  private class GameSelectListener implements ExpandedSelectListener<Game> {
+  private class GameSelectListener implements DynamicSelectListener<Game> {
 
     @Override
     public void onRemove(Game game) {
