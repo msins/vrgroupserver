@@ -11,16 +11,6 @@ public final class AbstractButtonFactory {
   private enum ButtonType implements ButtonFactory {
     CIRCULAR {
       @Override
-      public Button create(Icon icon, ComponentEventListener<ClickEvent<Button>> listener) {
-        return new Button(icon, listener);
-      }
-
-      @Override
-      public Button create(String text, ComponentEventListener<ClickEvent<Button>> listener) {
-        return new Button(text, listener);
-      }
-
-      @Override
       public Button applyStyle(Button button, ButtonVariant... variants) {
         super.applyStyle(button, variants);
         button.getStyle().set("border-radius", "50%");
@@ -28,17 +18,7 @@ public final class AbstractButtonFactory {
         return button;
       }
     },
-    RECTANGLE {
-      @Override
-      public Button create(Icon icon, ComponentEventListener<ClickEvent<Button>> listener) {
-        return new Button(icon, listener);
-      }
-
-      @Override
-      public Button create(String text, ComponentEventListener<ClickEvent<Button>> listener) {
-        return new Button(text, listener);
-      }
-    }
+    RECTANGLE
   }
 
   public static ButtonFactory getCircular() {

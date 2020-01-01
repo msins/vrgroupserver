@@ -36,9 +36,13 @@ public interface ButtonFactory {
     return applyStyle(create(icon, listener), PRIMARY);
   }
 
-  Button create(Icon icon, ComponentEventListener<ClickEvent<Button>> listener);
+  private Button create(Icon icon, ComponentEventListener<ClickEvent<Button>> listener) {
+    return new Button(icon, listener);
+  }
 
-  Button create(String text, ComponentEventListener<ClickEvent<Button>> listener);
+  private Button create(String text, ComponentEventListener<ClickEvent<Button>> listener) {
+    return new Button(text, listener);
+  }
 
   default Button applyStyle(Button button, ButtonVariant... variants) {
 
