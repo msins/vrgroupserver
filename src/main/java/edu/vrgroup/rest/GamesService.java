@@ -43,7 +43,7 @@ public class GamesService {
       return Response.status(404).entity("There is no game with that name.").build();
     }
 
-    GameResponse response = new GameResponse(game);
+    GameResource response = new GameResource(game);
     response.get();
 
     String output = JsonUtils.toJson(response);
