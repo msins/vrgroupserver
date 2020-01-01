@@ -10,7 +10,7 @@ public class GameDataProvider extends AbstractBackEndDataProvider<Game, Object> 
 
   @Override
   protected Stream<Game> fetchFromBackEnd(Query<Game, Object> query) {
-    return DaoProvider.getDao().getGames().stream();
+    return DaoProvider.getDao().getGames();
   }
 
   @Override

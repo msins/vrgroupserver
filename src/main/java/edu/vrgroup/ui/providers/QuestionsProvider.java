@@ -18,7 +18,7 @@ public class QuestionsProvider extends AbstractBackEndDataProvider<Question, Obj
 
   @Override
   protected Stream<Question> fetchFromBackEnd(Query<Question, Object> query) {
-    return DaoProvider.getDao().getQuestions(scenario).stream();
+    return DaoProvider.getDao().getQuestions(scenario);
   }
 
   @Override

@@ -23,8 +23,7 @@ public final class AnswersGridDataProvider extends AbstractBackEndDataProvider<A
 
   @Override
   protected Stream<Answer> fetchFromBackEnd(Query<Answer, Object> query) {
-    return DaoProvider.getDao().getAnswers(game, scenario, question, query.getOffset(), query.getLimit())
-        .stream();
+    return DaoProvider.getDao().getAnswers(game, scenario, question, query.getOffset(), query.getLimit());
   }
 
   @Override

@@ -17,7 +17,7 @@ public class ScenarioDataProvider extends AbstractBackEndDataProvider<Scenario, 
 
   @Override
   protected Stream<Scenario> fetchFromBackEnd(Query<Scenario, Object> query) {
-    return DaoProvider.getDao().getScenarios(game).stream();
+    return DaoProvider.getDao().getScenarios(game);
   }
 
   @Override
