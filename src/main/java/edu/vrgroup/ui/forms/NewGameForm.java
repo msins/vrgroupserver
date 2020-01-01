@@ -25,7 +25,6 @@ public class NewGameForm extends Dialog {
       }
 
       Game game = new Game(gameField.getValue());
-      DaoProvider.getDao().addGame(game);
       onAdd.accept(game);
       close();
     });

@@ -9,11 +9,12 @@ import edu.vrgroup.database.DaoProvider;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.ui.util.AbstractButtonFactory;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class NewScenarioForm extends Dialog {
 
-  public NewScenarioForm(Game game, Consumer<Scenario> onAdd) {
+  public NewScenarioForm(Game game, BiConsumer<Game, Scenario> onAdd) {
 
     TextField scenarioField = new TextField();
     scenarioField.setPlaceholder("New Scenario...");
@@ -26,8 +27,7 @@ public class NewScenarioForm extends Dialog {
       }
 
       Scenario scenario = new Scenario(scenarioField.getValue());
-      DaoProvider.getDao().addScenario(game, scenario);
-      onAdd.accept(scenario);
+      onAdd.accept(game, scenario);
       close();
     });
 
