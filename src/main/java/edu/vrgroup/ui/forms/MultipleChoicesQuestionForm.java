@@ -5,52 +5,77 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import edu.vrgroup.ui.util.AbstractButtonFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
-import javax.persistence.criteria.CriteriaBuilder.In;
 
 public class MultipleChoicesQuestionForm extends VerticalLayout {
 
   private TextArea text = new TextArea("Text");
-  private Choices choices = new Choices();
+  private ChoiceFields choiceFields = new ChoiceFields();
+  Button newChoice;
 
   public MultipleChoicesQuestionForm() {
-    Button newChoice = new Button(VaadinIcon.PLUS.create(), e -> {
-      TextField field = new TextField("", String.valueOf(choices.getFields().size() + 1)) {
-        @Override
-        public boolean equals(Object obj) {
-          if (!(obj instanceof TextField)) {
-            return false;
-          }
-          return this.getValue().equalsIgnoreCase(((TextField) obj).getValue());
-        }
-      };
-      field.setWidthFull();
-      choices.add(field);
-    });
-    text.setWidthFull();
-    newChoice.getStyle().set("border-radius", "50%");
-
+    initUi();
     //needs to have 2 choices minimum
     newChoice.click();
     newChoice.click();
+  }
+
+  public MultipleChoicesQuestionForm(String text, List<String> choices) {
+    initUi();
+    this.text.setValue(text);
+    choices.forEach(
+        choice -> choiceFields
+            .add(new DistinctTextField("", choice, String.valueOf(choiceFields.getFields().size() + 1))));
+  }
+
+  private void initUi() {
+    newChoice = AbstractButtonFactory.getCircular().createPrimaryButton(VaadinIcon.PLUS.create(), e -> {
+      TextField field = new DistinctTextField("", String.valueOf(choiceFields.getFields().size() + 1));
+      choiceFields.add(field);
+    });
+    text.setWidthFull();
 
     setAlignItems(Alignment.CENTER);
-    add(text, choices, newChoice);
+    add(text, choiceFields, newChoice);
+  }
+
+  private static class DistinctTextField extends TextField {
+
+    {
+      setWidthFull();
+    }
+
+    public DistinctTextField(String label, String initialValue, String placeholder) {
+      super(label, initialValue, placeholder);
+    }
+
+    public DistinctTextField(String label, String placeholder) {
+      super(label, placeholder);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof TextField)) {
+        return false;
+      }
+      return this.getValue().equalsIgnoreCase(((TextField) obj).getValue());
+    }
   }
 
   public TextArea getText() {
     return text;
   }
 
-  public Choices getChoices() {
-    return choices;
+  public ChoiceFields getChoiceFields() {
+    return choiceFields;
   }
 
   public IndexedChoice[] getChoicesValues() {
-    return IntStream.range(0, choices.getFields().size())
-        .mapToObj(i -> new IndexedChoice(i, choices.getFields().get(i).getValue()))
+    return IntStream.range(0, choiceFields.getFields().size())
+        .mapToObj(i -> new IndexedChoice(i, choiceFields.getFields().get(i).getValue()))
         .toArray(IndexedChoice[]::new);
   }
 
@@ -73,17 +98,12 @@ public class MultipleChoicesQuestionForm extends VerticalLayout {
     }
   }
 
-  public static class Choices extends VerticalLayout {
+  public static class ChoiceFields extends VerticalLayout {
 
     private List<TextField> fields = new ArrayList<>();
 
-    public Choices() {
-      getElement().getStyle().set("border-style", "groove");
-      getElement().getStyle().set("border-width", "thin");
-      getElement().getStyle().set("border-color", "var(--lumo-primary-color-10pct)");
-      getElement().getStyle().set("border-radius", "var(--lumo-border-radius-m)");
-      getElement().getStyle().set("box-shadow", "var(--lumo-boc-shadow-s)");
-      setAlignItems(Alignment.CENTER);
+    {
+      initStyle();
     }
 
     public void add(TextField textField) {
@@ -93,6 +113,15 @@ public class MultipleChoicesQuestionForm extends VerticalLayout {
 
     public List<TextField> getFields() {
       return fields;
+    }
+
+    private void initStyle() {
+      getElement().getStyle().set("border-style", "groove");
+      getElement().getStyle().set("border-width", "thin");
+      getElement().getStyle().set("border-color", "var(--lumo-primary-color-10pct)");
+      getElement().getStyle().set("border-radius", "var(--lumo-border-radius-m)");
+      getElement().getStyle().set("box-shadow", "var(--lumo-boc-shadow-s)");
+      setAlignItems(Alignment.CENTER);
     }
   }
 }
