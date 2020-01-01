@@ -6,11 +6,9 @@ import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.listbox.ListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.router.PageTitle;
@@ -29,63 +27,74 @@ import edu.vrgroup.ui.providers.QuestionsProvider;
 import edu.vrgroup.ui.util.AbstractButtonFactory;
 import edu.vrgroup.ui.util.AnswersGrid;
 import edu.vrgroup.ui.util.ResultChart;
+import edu.vrgroup.ui.util.StylizedHorizontalLayout;
+import edu.vrgroup.ui.util.StylizedList;
+import edu.vrgroup.ui.util.StylizedVerticalLayout;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Route(value = "questions", layout = MainAppUi.class)
 @PageTitle("Questions")
-public class QuestionsUi extends HorizontalLayout implements GameChangeListener, ScenarioChangeListener {
+public class QuestionsUi extends StylizedHorizontalLayout implements GameChangeListener, ScenarioChangeListener {
 
   private Game game;
   private Scenario scenario;
-  private Questions questions;
-  private QuestionView questionInformation;
+  private QuestionList questionList;
+  private QuestionInformation questionInformation;
 
   public QuestionsUi() {
-    questions = new Questions();
+    questionList = new QuestionList();
 
-    if (game != null) {
-      questions.setDataProvider(new QuestionsProvider(scenario));
+    if (game != null && scenario != null) {
+      questionList.setDataProvider(new QuestionsProvider(scenario));
     }
     setSizeFull();
 
-    questions.addValueChangeListener(list -> {
-      QuestionView old = questionInformation;
+    questionList.addValueChangeListener(list -> {
+      QuestionInformation old = questionInformation;
       if (list.getValue() != null) {
-        questionInformation = new QuestionView(
+        questionInformation = new QuestionInformation(
             this.game,
             this.scenario,
             list.getValue(),
-            questions.getDataProvider());
+            question -> {
+              DaoProvider.getDao().removeQuestion(question);
+              questionList.getDataProvider().refreshAll();
+            },
+            (question, newText) -> {
+              DaoProvider.getDao().updateQuestion(question, newText);
+              questionList.getDataProvider().refreshAll();
+              questionList.setValue(question);
+            });
       }
 
       replace(old, questionInformation);
       add(questionInformation);
     });
 
-    Button button = new Button("New question", VaadinIcon.PLUS.create(),
-        e -> new NewQuestionForm(scenario, question -> questions.getDataProvider().refreshAll()).open()) {{
-      setWidthFull();
-    }};
+    Button newQuestionBtn = new Button("New question", VaadinIcon.PLUS.create(),
+        e -> new NewQuestionForm(scenario, question -> questionList.getDataProvider().refreshAll()).open());
+    newQuestionBtn.setWidthFull();
 
-    add(new VerticalLayout(button, questions) {{
-      setMaxWidth("25%");
-      setMinWidth("25%");
-    }});
+    StylizedVerticalLayout listLayout = new StylizedVerticalLayout(newQuestionBtn, questionList);
+    listLayout.setAlignItems(Alignment.CENTER);
+    listLayout.setMaxWidth("25%");
+    listLayout.setMinWidth("25%");
+    add(listLayout);
   }
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
-    super.onAttach(attachEvent);
     registerToGameNotifier();
-    registerToScenarioNotifier(game);
   }
 
   @Override
   protected void onDetach(DetachEvent detachEvent) {
-    super.onDetach(detachEvent);
     unregisterFromGameNotifier();
     unregisterFromScenarioNotifier(game);
   }
@@ -93,10 +102,9 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
   @Override
   public void gameChanged(Game game) {
     this.game = game;
-    if (scenario != null) {
-      questions.setDataProvider(new QuestionsProvider(scenario));
-    }
-    questions.getDataProvider().refreshAll();
+    System.out.println("[Questions] New game: " + game);
+    registerToScenarioNotifier(game);
+    questionList.getDataProvider().refreshAll();
     if (questionInformation != null) {
       questionInformation.removeAll();
     }
@@ -104,59 +112,44 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
 
   @Override
   public void scenarioChanged(Scenario scenario) {
+    System.out.println("[Questions] New scenario: " + scenario);
     this.scenario = scenario;
     if (questionInformation != null) {
-      questionInformation.setScenario(scenario);
+      questionInformation.removeAll();
     }
+    if (scenario == null) {
+      return;
+    }
+
+    questionList.setDataProvider(new QuestionsProvider(scenario));
   }
 
-  private static class Questions extends ListBox<Question> {
+  private static class QuestionList extends StylizedList<Question> {
 
     {
-      getElement().getStyle().set("border-style", "groove");
-      getElement().getStyle().set("border-width", "thin");
-      getElement().getStyle().set("border-color", "var(--lumo-primary-color-10pct)");
-      getElement().getStyle().set("border-radius", "var(--lumo-border-radius-m)");
-      getElement().getStyle().set("box-shadow", "var(--lumo-boc-shadow-s)");
       setHeightFull();
-      setRenderer(new TextRenderer<>(Question::getText));
       setWidthFull();
-    }
-
-    public Questions() {
+      setRenderer(new TextRenderer<>(Question::getText));
     }
   }
 
-  private static class QuestionView extends VerticalLayout {
+  private static class QuestionInformation extends StylizedVerticalLayout {
 
     private ResultChart<Question> chart;
     private Grid<Answer> grid;
     private Game game;
     private Scenario scenario;
     private Question question;
-    private DataProvider<Question, ?> notifier;
 
-    public QuestionView(Game game, Scenario scenario, Question question, DataProvider<Question, ?> notifier) {
+    public QuestionInformation(Game game, Scenario scenario, Question question, Consumer<Question> onDelete,
+        BiConsumer<Question, String> onSync) {
       this.game = game;
       this.scenario = scenario;
       this.question = question;
-      this.notifier = notifier;
-      initUi();
+      initUi(onDelete, onSync);
     }
 
-    public void setGame(Game game) {
-      this.game = game;
-    }
-
-    public void setScenario(Scenario scenario) {
-      this.scenario = scenario;
-    }
-
-    public void setQuestion(Question question) {
-      this.question = question;
-    }
-
-    private void initUi() {
+    private void initUi(Consumer<Question> onDelete, BiConsumer<Question, String> onSync) {
       chart = new ResultChart<>(question);
       chart.setWidthFull();
 
@@ -175,29 +168,30 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       text.setWidthFull();
       layout.add(text);
 
-      Button refresh = new Button(VaadinIcon.REFRESH.create(), e -> {
-        List<Answer> answers = DaoProvider.getDao().getAllAnswers(game, scenario, question);
+      Button refresh = AbstractButtonFactory.getCircular().createPrimaryButton(VaadinIcon.REFRESH.create(), e -> {
+        //todo fix
+        List<Answer> answers = DaoProvider.getDao().getAnswers(game, scenario, question, 0, Integer.MAX_VALUE).collect(
+            Collectors.toList());
         Number[] stats = QuestionStatistics.get(answers, question);
         chart.refresh(stats);
         grid.getDataProvider().refreshAll();
       });
       refresh.click();
 
-      Button delete = AbstractButtonFactory.getRectangle().createRedButton("Delete", e -> {
-        DaoProvider.getDao().removeQuestion(question);
+      Button delete = AbstractButtonFactory.getCircular().createRedButton(VaadinIcon.CLOSE.create(), e -> {
+        onDelete.accept(question);
         removeAll();
-        notifier.refreshAll();
       });
 
-      Button sync = AbstractButtonFactory.getRectangle().createGreenButton("Sync",
-          e -> {
-            DaoProvider.getDao().updateQuestion(question, text.getValue());
-            notifier.refreshAll();
+      Button sync = AbstractButtonFactory.getCircular()
+          .createGreenButton(VaadinIcon.ARCHIVE.create(), e -> {
+            onSync.accept(question, text.getValue());
+            e.getSource().setEnabled(false);
           });
       sync.setEnabled(false);
       text.addKeyPressListener(e -> sync.setEnabled(true));
 
-      layout.add(new HorizontalLayout(refresh, delete, sync));
+      layout.add(new StylizedHorizontalLayout(refresh, delete, sync));
       add(layout);
     }
   }
@@ -224,6 +218,7 @@ public class QuestionsUi extends HorizontalLayout implements GameChangeListener,
       this.game = game;
       this.scenario = scenario;
       this.question = question;
+      initUi();
     }
 
     private void initUi() {

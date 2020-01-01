@@ -39,6 +39,7 @@ import edu.vrgroup.ui.providers.GameDataProvider;
 import edu.vrgroup.ui.providers.ScenarioDataProvider;
 import edu.vrgroup.ui.util.AbstractButtonFactory;
 import edu.vrgroup.util.SecurityUtils;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 @Route("")
@@ -122,69 +123,69 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
 
   @Override
   protected void onDetach(DetachEvent detachEvent) {
-    super.onDetach(detachEvent);
     unregisterFromGameNotifier();
+    unregisterFromScenarioNotifier(gameSelect.getValue());
   }
 
   @Override
   public void gameChanged(Game game) {
-    registerToScenarioNotifier(game);
-    gameSelect.setValue(game);
+    if (game == null) {
+      return;
+    }
     scenarioSelect.getSelect().setDataProvider(new ScenarioDataProvider(game));
+    System.out.println("[Main] New game:" + game);
+    registerToScenarioNotifier(game);
   }
 
   @Override
   public void scenarioChanged(Scenario scenario) {
-    scenarioSelect.setValue(scenario);
+    System.out.println("[Main] New scenario:" + scenario);
   }
 
+  /**
+   * Lister for changes in scenario select ui element.
+   */
   private class ScenarioDynamicSelectListener implements DynamicSelectListener<Scenario> {
 
     @Override
-    public void onRemove(Scenario scenario) {
+    public void onRemoveClicked(Scenario scenario) {
       if (scenarioSelect.getSelect().getValue() == null) {
-        Notification notification = new Notification("No scenario selected", 3000);
-        notification.getElement().getStyle().set("color", "red");
-        notification.open();
+        new Notification("No scenario selected", 3000).open();
         return;
       }
 
       if (scenario.getName().equalsIgnoreCase("default")) {
-        Notification notification = new Notification("Can't remove default scenario", 3000);
-        notification.getElement().getStyle().set("color", "red");
-        notification.open();
+        new Notification("Can't remove default scenario", 3000).open();
         return;
       }
 
       DaoProvider.getDao().removeScenario(scenario);
+      scenarioSelect.refreshAll();
+      getCurrentNotifier(gameSelect.getValue()).setScenario(null);
     }
 
     @Override
     public void onSelectionChange(Scenario scenario) {
       if (scenario != null) {
-        var scenarioNotifier = ((ScenarioChangeNotifier) VaadinSession.getCurrent()
-            .getAttribute(getCurrentGame().getName() + ".scenario.notifier"));
-        scenarioNotifier.setScenario(scenario);
+        getCurrentNotifier(getCurrentGame()).setScenario(scenario);
       }
     }
 
     @Override
-    public void onAdd(Scenario scenario) {
+    public void onAddClicked(Scenario oldScenario) {
       if (gameSelect.getValue() == null) {
-        Notification notification = new Notification("No game selected", 3000);
-        notification.getElement().getStyle().set("color", "red");
-        notification.open();
+        new Notification("No game selected", 3000).open();
         return;
       }
 
-      Consumer<Scenario> onNewScenario = e -> {
-        if (e.getName().equalsIgnoreCase("Default")) {
-          Notification notification = new Notification("Can't create default", 3000);
-          notification.getElement().getStyle().set("color", "red");
-          notification.open();
+      BiConsumer<Game, Scenario> onNewScenario = (newGame, newScenario) -> {
+        if (newScenario.getName().equalsIgnoreCase("Default")) {
+          new Notification("Can't create default", 3000).open();
           return;
         }
-        DaoProvider.getDao().addScenario(getCurrentGame(), scenario);
+        DaoProvider.getDao().addScenario(newGame, newScenario);
+        scenarioSelect.refreshAll();
+        scenarioSelect.setValue(newScenario);
       };
       new NewScenarioForm(gameSelect.getValue(), onNewScenario).open();
     }
@@ -193,23 +194,30 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
       var gameNotifier = ((GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier"));
       return gameNotifier.getGame();
     }
+
+    private ScenarioChangeNotifier getCurrentNotifier(Game game) {
+      return ((ScenarioChangeNotifier) VaadinSession.getCurrent().getAttribute(game.getName() + ".scenario.notifier"));
+    }
   }
 
+  /**
+   * Lister for changes in game select ui element.
+   */
   private class GameSelectListener implements DynamicSelectListener<Game> {
 
     @Override
-    public void onRemove(Game game) {
+    public void onRemoveClicked(Game oldGame) {
       if (gameSelect.getValue() == null) {
-        Notification notification = new Notification("No game selected", 3000);
-        notification.getElement().getStyle().set("color", "red");
-        notification.open();
+        new Notification("No game selected", 3000).open();
         return;
       }
 
+      unregisterFromScenarioNotifier(oldGame);
       DaoProvider.getDao().removeGame(gameSelect.getValue());
       gameSelect.refreshAll();
-      unregisterFromScenarioNotifier(game);
       scenarioSelect.refreshAll();
+      getCurrentNotifier().setGame(null);
+
     }
 
     @Override
@@ -221,9 +229,10 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
     }
 
     @Override
-    public void onAdd(Game game) {
+    public void onAddClicked(Game oldGame) {
 
       Consumer<Game> newGameCreated = newGame -> {
+        DaoProvider.getDao().addGame(newGame);
         gameSelect.refreshAll();
         gameSelect.setValue(newGame);
 
@@ -234,5 +243,10 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
       };
       new NewGameForm(newGameCreated).open();
     }
+
+    private GameChangeNotifier getCurrentNotifier() {
+      return ((GameChangeNotifier) VaadinSession.getCurrent().getAttribute("game.notifier"));
+    }
+
   }
 }
