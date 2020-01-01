@@ -17,11 +17,11 @@ public class DynamicSelect<T> extends StylizedFlexLayout {
     select.addValueChangeListener(e -> l.onSelectionChange(e.getValue()));
 
     add = AbstractButtonFactory.getCircular()
-        .createGreenButton(VaadinIcon.PLUS.create(), e -> l.onAdd(select.getValue()));
+        .createGreenButton(VaadinIcon.PLUS.create(), e -> l.onAddClicked(select.getValue()));
     add.addThemeVariants(ButtonVariant.LUMO_SMALL);
 
     remove = AbstractButtonFactory.getCircular()
-        .createRedButton(VaadinIcon.MINUS.create(), e -> l.onRemove(select.getValue()));
+        .createRedButton(VaadinIcon.MINUS.create(), e -> l.onRemoveClicked(select.getValue()));
     remove.addThemeVariants(ButtonVariant.LUMO_SMALL);
 
     initUi();
@@ -54,10 +54,10 @@ public class DynamicSelect<T> extends StylizedFlexLayout {
 
   public interface DynamicSelectListener<T> {
 
-    void onRemove(T t);
+    void onRemoveClicked(T oldValue);
 
-    void onSelectionChange(T t);
+    void onSelectionChange(T value);
 
-    void onAdd(T t);
+    void onAddClicked(T oldValue);
   }
 }

@@ -1,11 +1,16 @@
 package edu.vrgroup.ui.util;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 public class StylizedHorizontalLayout extends HorizontalLayout {
 
   {
     initStyle();
+  }
+
+  public StylizedHorizontalLayout(Component... children) {
+    super(children);
   }
 
   private void initStyle() {
