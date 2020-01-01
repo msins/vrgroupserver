@@ -8,10 +8,17 @@ import edu.vrgroup.model.Scenario;
 import edu.vrgroup.model.User;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface Dao {
 
-  List<Question> getQuestions(Scenario scenario);
+  //QUESTION DAO API
+
+  Stream<Question> getAllQuestions();
+
+  int getQuestionCount();
+
+  Stream<Question> getQuestions(Scenario scenario);
 
   void addQuestion(Scenario scenario, Question question);
 
@@ -21,11 +28,15 @@ public interface Dao {
 
   int getQuestionsCount(Scenario scenario);
 
+  //CHOICE DAO API
+
   List<Choice> getChoices(Question question);
+
+  //GAME DAO API
 
   int getGamesCount();
 
-  List<Game> getGames();
+  Stream<Game> getGames();
 
   Game getGame(String gameName);
 
@@ -33,26 +44,34 @@ public interface Dao {
 
   void removeGame(Game game);
 
-  int getAnswersCount();
+  //ANSWERS DAO API
 
-  List<Answer> getAnswers(int offset, int limit);
+  int getAnswersCount();
 
   int getAnswersCount(Game game);
 
-  List<Answer> getAnswers(Game game, int offset, int limit);
+  int getAnswersCount(Game game, Scenario scenario);
 
-  List<Answer> getAnswers(Game game, Scenario scenario, Question question, int offset, int limit);
+  int getAnswersCount(Game game, Scenario scenario, Question question);
 
-  List<Answer> getAllAnswers(Game game, Scenario scenario, Question question);
+  Stream<Answer> getAnswers(int offset, int limit);
+
+  Stream<Answer> getAnswers(Game game, int offset, int limit);
+
+  Stream<Answer> getAnswers(Game game, Scenario scenario, int offset, int limit);
+
+  Stream<Answer> getAnswers(Game game, Scenario scenario, Question question, int offset, int limit);
 
   void addAnswer(Game game, Scenario scenario, Question question, Choice choice, User user, Timestamp timestamp,
       String IPv4);
 
-  int getAnswersCount(Game game, Scenario scenario, Question question);
+  //USER DAO API
 
   void addUser(User user);
 
-  List<Scenario> getScenarios(Game game);
+  //SCENARIO DAO API
+
+  Stream<Scenario> getScenarios(Game game);
 
   int getScenarioCount(Game game);
 

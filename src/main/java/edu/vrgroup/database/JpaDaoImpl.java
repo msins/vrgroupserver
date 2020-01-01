@@ -10,23 +10,43 @@ import edu.vrgroup.model.ScenarioQuestion;
 import edu.vrgroup.model.User;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.validation.constraints.Null;
 
 public class JpaDaoImpl implements Dao {
 
+  //QUESTIONS DAO API
+
   @Override
-  public List<Question> getQuestions(Scenario scenario) {
+  public Stream<Question> getAllQuestions() {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery("select q from Question as q", Question.class)
+        .getResultStream();
+  }
+
+  @Override
+  public int getQuestionCount() {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery("select count(*) from Question", Long.class)
+        .getSingleResult().intValue();
+  }
+
+  @Override
+  public Stream<Question> getQuestions(@Nonnull Scenario scenario) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select q from Question as q, ScenarioQuestion as sq where q.id = sq.question.id and sq.scenario.id = :scenarioId",
             Question.class)
         .setParameter("scenarioId", scenario.getId())
-        .getResultList();
+        .getResultStream();
   }
 
   @Override
-  public void addQuestion(Scenario scenario, Question question) {
+  public void addQuestion(@Nonnull Scenario scenario, @Nonnull Question question) {
     JpaEntityManagerProvider.getEntityManager().persist(question);
     for (var choice : question.getChoices()) {
       JpaEntityManagerProvider.getEntityManager().persist(choice);
@@ -36,7 +56,7 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public void updateQuestion(Question question, String newText) {
+  public void updateQuestion(@Nonnull Question question, @Nonnull String newText) {
     JpaEntityManagerProvider.getEntityManager()
         .createQuery("update Question as q set q.text = :newText where q.id = :questionId")
         .setParameter("newText", newText)
@@ -47,7 +67,7 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public void removeQuestion(Question question) {
+  public void removeQuestion(@Nonnull Question question) {
     EntityManager em = JpaEntityManagerProvider.getEntityManager();
     em.createQuery("delete from Question as q where q.id = :questionId")
         .setParameter("questionId", question.getId()).executeUpdate();
@@ -56,7 +76,7 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public int getQuestionsCount(Scenario scenario) {
+  public int getQuestionsCount(@Nonnull Scenario scenario) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select count(*) from Question as q, ScenarioQuestion as sq where q.id = sq.question.id and sq.scenario.id = :scenarioId",
@@ -65,14 +85,17 @@ public class JpaDaoImpl implements Dao {
         .getSingleResult().intValue();
   }
 
+  //CHOICES DAO API
+
   @Override
-  public List<Choice> getChoices(Question question) {
+  public List<Choice> getChoices(@Nonnull Question question) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery("select choice from Choice as choice where choice.question.id = :questionId", Choice.class)
         .setParameter("questionId", question.getId())
-        .setMaxResults(50)
         .getResultList();
   }
+
+  //GAME DAO API
 
   @Override
   public int getGamesCount() {
@@ -82,14 +105,14 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public List<Game> getGames() {
+  public Stream<Game> getGames() {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery("select game from Game as game", Game.class)
-        .setMaxResults(50)
-        .getResultList();
+        .getResultStream();
   }
 
   @Override
+  @Nullable
   public Game getGame(String gameName) {
     try {
       return JpaEntityManagerProvider.getEntityManager()
@@ -101,7 +124,7 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public void addGame(Game game) {
+  public void addGame(@Nonnull Game game) {
     JpaEntityManagerProvider.getEntityManager().persist(game);
     Scenario defaultScenario = new Scenario("Default");
     JpaEntityManagerProvider.getEntityManager().persist(defaultScenario);
@@ -110,11 +133,13 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public void removeGame(Game game) {
+  public void removeGame(@Nonnull Game game) {
     EntityManager em = JpaEntityManagerProvider.getEntityManager();
     em.remove(em.contains(game) ? game : em.merge(game));
     commit();
   }
+
+  //ANSWERS DAO API
 
   @Override
   public int getAnswersCount() {
@@ -124,19 +149,16 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public List<Answer> getAnswers(int offset, int limit) {
+  public Stream<Answer> getAnswers(int offset, int limit) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery("select answer from Answer as answer", Answer.class)
         .setFirstResult(offset)
         .setMaxResults(limit)
-        .getResultList();
+        .getResultStream();
   }
 
   @Override
-  public int getAnswersCount(Game game) {
-    if (game == null) {
-      return getAnswersCount();
-    }
+  public int getAnswersCount(@Nonnull Game game) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery("select count(*) from Answer as answer where answer.game.id = :gameId", Long.class)
         .setParameter("gameId", game.getId())
@@ -144,47 +166,18 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public List<Answer> getAnswers(Game game, int offset, int limit) {
-    if (game == null) {
-      return getAnswers(offset, limit);
-    }
-
-    return JpaEntityManagerProvider.getEntityManager()
-        .createQuery("select answer from Answer as answer where answer.game.id = :gameId", Answer.class)
-        .setParameter("gameId", game.getId())
-        .setFirstResult(offset)
-        .setMaxResults(limit)
-        .getResultList();
-  }
-
-  @Override
-  public List<Answer> getAnswers(Game game, Scenario scenario, Question question, int offset, int limit) {
+  public int getAnswersCount(@Nonnull Game game, @Nonnull Scenario scenario) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
-            "select answer from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId",
-            Answer.class)
+            "select count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId",
+            Long.class)
         .setParameter("gameId", game.getId())
         .setParameter("scenarioId", scenario.getId())
-        .setParameter("questionId", question.getId())
-        .setFirstResult(offset)
-        .setMaxResults(limit)
-        .getResultList();
+        .getSingleResult().intValue();
   }
 
   @Override
-  public List<Answer> getAllAnswers(Game game, Scenario scenario, Question question) {
-    return JpaEntityManagerProvider.getEntityManager()
-        .createQuery(
-            "select answer from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId",
-            Answer.class)
-        .setParameter("gameId", game.getId())
-        .setParameter("scenarioId", scenario.getId())
-        .setParameter("questionId", question.getId())
-        .getResultList();
-  }
-
-  @Override
-  public int getAnswersCount(Game game, Scenario scenario, Question question) {
+  public int getAnswersCount(@Nonnull Game game, @Nonnull Scenario scenario, @Nonnull Question question) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select count(*) from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId",
@@ -196,6 +189,45 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
+  public Stream<Answer> getAnswers(@Nonnull Game game, int offset, int limit) {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery("select answer from Answer as answer where answer.game.id = :gameId", Answer.class)
+        .setParameter("gameId", game.getId())
+        .setFirstResult(offset)
+        .setMaxResults(limit)
+        .getResultStream();
+  }
+
+  @Override
+  public Stream<Answer> getAnswers(@Nonnull Game game, @Nonnull Scenario scenario, int offset, int limit) {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery(
+            "select answer from Answer as answer where answer.game.id = :gameId and answer.scenario.id=:scenarioId",
+            Answer.class)
+        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
+        .setFirstResult(offset)
+        .setMaxResults(limit)
+        .getResultStream();
+  }
+
+  @Override
+  public Stream<Answer> getAnswers(@Nonnull Game game, @Nonnull Scenario scenario, @Nonnull Question question,
+      int offset,
+      int limit) {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery(
+            "select answer from Answer as answer where answer.game.id = :gameId and answer.scenario.id = :scenarioId and answer.question.id = :questionId",
+            Answer.class)
+        .setParameter("gameId", game.getId())
+        .setParameter("scenarioId", scenario.getId())
+        .setParameter("questionId", question.getId())
+        .setFirstResult(offset)
+        .setMaxResults(limit)
+        .getResultStream();
+  }
+
+  @Override
   public void addAnswer(Game game, Scenario scenario, Question question, Choice choice, User user, Timestamp timestamp,
       String IPv4) {
     Answer answer = new Answer(timestamp, question, scenario, game, user, choice, IPv4);
@@ -203,28 +235,33 @@ public class JpaDaoImpl implements Dao {
     commit();
   }
 
+  //USER DAO API
+
   @Override
-  public void addUser(User user) {
+  public void addUser(@Nonnull User user) {
     JpaEntityManagerProvider.getEntityManager().persist(user);
     commit();
   }
 
+  //SCENARIO DAO API
+
   @Override
-  public void addScenario(Game game, Scenario scenario) {
+  public void addScenario(@Nonnull Game game, @Nonnull Scenario scenario) {
     JpaEntityManagerProvider.getEntityManager().persist(scenario);
     JpaEntityManagerProvider.getEntityManager().persist(new GameScenario(game, scenario));
     commit();
   }
 
   @Override
-  public void removeScenario(Scenario scenario) {
+  public void removeScenario(@Nonnull Scenario scenario) {
     EntityManager em = JpaEntityManagerProvider.getEntityManager();
     em.remove(em.contains(scenario) ? scenario : em.merge(scenario));
     commit();
+    clearCache();
   }
 
   @Override
-  public int getScenarioCount(Game game) {
+  public int getScenarioCount(@Nonnull Game game) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select count(*) from Scenario as scenario, GameScenario as gs where scenario.id = gs.scenario.id and gs.game.id = :gameId",
@@ -234,14 +271,16 @@ public class JpaDaoImpl implements Dao {
   }
 
   @Override
-  public List<Scenario> getScenarios(Game game) {
+  public Stream<Scenario> getScenarios(@Nonnull Game game) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery(
             "select scenario from Scenario as scenario, GameScenario as gs where scenario.id = gs.scenario.id and gs.game.id=:gameId",
             Scenario.class)
         .setParameter("gameId", game.getId())
-        .getResultList();
+        .getResultStream();
   }
+
+  //HELPER METHODS
 
   private void clearCache() {
     JpaEntityManagerProvider.getEntityManager().clear();
