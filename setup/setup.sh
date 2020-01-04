@@ -14,10 +14,10 @@ echo "Updating package lists..."
 sudo apt-get update > /dev/null 2>&1
 
 echo "Downloading openjdk 11..."
-sudo apt-get install openjdk-11-jdk > /dev/null 2>&1
+sudo apt-get install openjdk-11-jdk
 
 echo "Installing maven"
-sudo apt-get install maven > /dev/null 2>&1
+sudo apt-get install maven
 
 if command -v python3 &>/dev/null; then
     echo "Installing python3"
