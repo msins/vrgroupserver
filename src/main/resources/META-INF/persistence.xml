@@ -21,7 +21,7 @@
       <property name="hibernate.connection.url"
         value="jdbc:mysql://localhost/vrserver?useUnicode=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=GMT&amp;autoReconnect=true"/>
 
-      <!--      Edit this after you clone repository to match your db username/password-->
+      <!-- 'sudo bash setup/setup.sh ~/<path>/vrgroupserver' will setup or override these values-->
       <property name="hibernate.connection.username" value="username"/>
       <property name="hibernate.connection.password" value="password"/>
 
