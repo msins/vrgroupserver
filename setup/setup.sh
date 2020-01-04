@@ -5,7 +5,8 @@ if [[ ! -d ${git_dir} ]]; then
     exit
 fi
 
-if [[ "${git_dir}" != *vrgroupserver ]]; then
+echo ${git_dir}
+if [[ "${git_dir}" =~ '*vrgroupserver' ]] || [[ "${git_dir}" =~ '*vrgroupserver/' ]]; then
   echo "Pass the directory to git clone ex. /home/<dir>/vrgroupserver"
   exit
 fi
@@ -32,20 +33,28 @@ if [[ "$runMySqlInstallation" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     sudo mysql_secure_installation
 fi
 
-echo "Create db user for login:"
-read -p 'Username: ' username
-read -sp 'Password: ' password
+read -r -p 'Create the database vrserver(don'\''t accept if database is already created) [y/N]?' createUser
+if [[ "$createUser" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    sudo mysql -e "create database vrserver;"
+    sudo mysql -e "use vrserver;source ${git_dir}/setup/init.sql;"
+    sudo echo "wait_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+    sudo echo "interactive_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+fi
 
-sudo mysql -e "create user '$username'@'localhost' identified by '$password'"
-sudo mysql -e "create database vrserver; GRANT ALL PRIVILEGES ON vrserver.* to '$username'@'localhost'"
-sudo mysql -e "use vrserver;source ${git_dir}/setup/init.sql;"
+read -r -p 'Create new user access to vrserver database [y/N]?' createUser
+if [[ "$createUser" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    read -p 'Username: ' username
+    read -sp 'Password: ' password
+    sudo mysql -e "create user '$username'@'localhost' identified by '$password'"
+    sudo mysql -r "GRANT ALL PRIVILEGES ON vrserver.* to '$username'@'localhost'"
+    python3 ${git_dir}/setup/update.py ${git_dir}/src/main/resources/META-INF/persistence.xml ${username} ${password}
+fi
 
-sudo echo "wait_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-sudo echo "interactive_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-echo
-sudo /etc/init.d/mysql restart
+read -r -p 'Restart database [y/N]?' restartDb
+if [[ "$restartDb" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    sudo /etc/init.d/mysql restart
+fi
 
-python3 ${git_dir}/setup/update.py ${git_dir}/src/main/resources/META-INF/persistence.xml ${username} ${password}
 read -r -p 'Run the server now[y/N]?' runServer
 if [[ "$runServer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     if dpkg -s net-tools &>/dev/null; then
