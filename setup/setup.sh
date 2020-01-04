@@ -42,6 +42,7 @@ sudo mysql -e "use vrserver;source $HOME/vrgroupserver/setup/init.sql;"
 
 sudo echo "wait_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo echo "interactive_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo
 sudo /etc/init.d/mysql restart
 
 python3 ${git_dir}/setup/update.py ${git_dir}/src/main/resources/META-INF/persistence.xml ${username} ${password}
