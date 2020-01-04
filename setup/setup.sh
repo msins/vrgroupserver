@@ -44,7 +44,7 @@ sudo echo "wait_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo echo "interactive_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo /etc/init.d/mysql restart
 
-python3 ${git_dir}/setup/update.py ${username} ${password}
+python3 ${git_dir}/setup/update.py ${git_dir}/src/main/resources/META-INF/persistence.xml ${username} ${password}
 read -r -p 'Run the server now[y/N]?' runServer
 if [[ "$runServer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     if dpkg -s net-tools; then
