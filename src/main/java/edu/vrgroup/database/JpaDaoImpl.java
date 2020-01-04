@@ -142,19 +142,19 @@ public class JpaDaoImpl implements Dao {
   //ANSWERS DAO API
 
   @Override
-  public int getAnswersCount() {
-    return JpaEntityManagerProvider.getEntityManager()
-        .createQuery("select count(*) from Answer", Long.class)
-        .getSingleResult().intValue();
-  }
-
-  @Override
   public Stream<Answer> getAnswers(int offset, int limit) {
     return JpaEntityManagerProvider.getEntityManager()
         .createQuery("select answer from Answer as answer", Answer.class)
         .setFirstResult(offset)
         .setMaxResults(limit)
         .getResultStream();
+  }
+
+  @Override
+  public int getAnswersCount() {
+    return JpaEntityManagerProvider.getEntityManager()
+        .createQuery("select count(*) from Answer", Long.class)
+        .getSingleResult().intValue();
   }
 
   @Override

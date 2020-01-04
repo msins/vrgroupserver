@@ -38,7 +38,7 @@ read -sp 'Password: ' password
 
 sudo mysql -e "create user '$username'@'localhost' identified by '$password'"
 sudo mysql -e "create database vrserver; GRANT ALL PRIVILEGES ON vrserver.* to '$username'@'localhost'"
-sudo mysql -e "use vrserver;source $HOME/vrgroupserver/setup/init.sql;"
+sudo mysql -e "use vrserver;source ${git_dir}/setup/init.sql;"
 
 sudo echo "wait_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo echo "interactive_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -48,7 +48,7 @@ sudo /etc/init.d/mysql restart
 python3 ${git_dir}/setup/update.py ${git_dir}/src/main/resources/META-INF/persistence.xml ${username} ${password}
 read -r -p 'Run the server now[y/N]?' runServer
 if [[ "$runServer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    if dpkg -s net-tools; then
+    if dpkg -s net-tools &>/dev/null; then
         if  [[ `netstat -tlpn | grep 80 | grep java` ]] &>/dev/null; then
             echo "Shut down server before executing this script"
             exit
@@ -63,6 +63,7 @@ if [[ "$runServer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     fi
     cd ${git_dir}
     nohup mvn jetty:run -Pproduction &
+    echo
 fi
 
 

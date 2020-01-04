@@ -26,18 +26,26 @@ public class DashboardGridAnswersProvider extends AbstractBackEndDataProvider<An
   @Override
   protected Stream<Answer> fetchFromBackEnd(Query<Answer, Object> query) {
     //temporary design
-    if (scenario != null) {
+    if (scenario != null && game != null) {
       return DaoProvider.getDao().getAnswers(game, scenario, query.getOffset(), query.getLimit());
     }
-    return DaoProvider.getDao().getAnswers(game, query.getOffset(), query.getLimit());
+    if (game != null) {
+      return DaoProvider.getDao().getAnswers(game, query.getOffset(), query.getLimit());
+    }
+
+    return DaoProvider.getDao().getAnswers(query.getOffset(), query.getLimit());
   }
 
   @Override
   protected int sizeInBackEnd(Query<Answer, Object> query) {
     //temporary design
-    if (scenario != null) {
+    if (scenario != null && game != null) {
       return DaoProvider.getDao().getAnswersCount(game, scenario);
     }
-    return DaoProvider.getDao().getAnswersCount(game);
+    if (game != null) {
+      return DaoProvider.getDao().getAnswersCount(game);
+    }
+
+    return DaoProvider.getDao().getAnswersCount();
   }
 }
