@@ -236,10 +236,12 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
         gameSelect.refreshAll();
         gameSelect.setValue(newGame);
 
+        Scenario defaultScenario = new Scenario("Default");
+        DaoProvider.getDao().addScenario(newGame, defaultScenario);
+
         scenarioSelect.getSelect().setDataProvider(new ScenarioDataProvider(newGame));
         scenarioSelect.refreshAll();
-
-        //todo set for default scenario
+        scenarioSelect.setValue(defaultScenario);
       };
       new NewGameForm(newGameCreated).open();
     }

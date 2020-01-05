@@ -126,9 +126,6 @@ public class JpaDaoImpl implements Dao {
   @Override
   public void addGame(@Nonnull Game game) {
     JpaEntityManagerProvider.getEntityManager().persist(game);
-    Scenario defaultScenario = new Scenario("Default");
-    JpaEntityManagerProvider.getEntityManager().persist(defaultScenario);
-    JpaEntityManagerProvider.getEntityManager().persist(new GameScenario(game, defaultScenario));
     commit();
   }
 
