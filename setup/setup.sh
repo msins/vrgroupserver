@@ -5,7 +5,6 @@ if [[ ! -d ${git_dir} ]]; then
     exit
 fi
 
-echo ${git_dir}
 if [[ "${git_dir}" =~ '*vrgroupserver' ]] || [[ "${git_dir}" =~ '*vrgroupserver/' ]]; then
   echo "Pass the directory to git clone ex. /home/<dir>/vrgroupserver"
   exit
@@ -37,28 +36,30 @@ read -r -p 'Create the database vrserver(don'\''t accept if database is already 
 if [[ "$createUser" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     sudo mysql -e "create database vrserver;"
     sudo mysql -e "use vrserver;source ${git_dir}/setup/init.sql;"
-    sudo echo "wait_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
-    sudo echo "interactive_timeout=31536000" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+    sudo echo "wait_timeout=31536000" | sudo tee -a /etc/mysql/mysql.conf.d/mysqld.cnf
+    sudo echo "interactive_timeout=31536000" | sudo tee -a /etc/mysql/mysql.conf.d/mysqld.cnf
 fi
 
 read -r -p 'Create new user access to vrserver database [y/N]?' createUser
 if [[ "$createUser" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     read -p 'Username: ' username
     read -sp 'Password: ' password
+    echo
     sudo mysql -e "create user '$username'@'localhost' identified by '$password'"
-    sudo mysql -r "GRANT ALL PRIVILEGES ON vrserver.* to '$username'@'localhost'"
-    python3 ${git_dir}/setup/update.py ${git_dir}/src/main/resources/META-INF/persistence.xml ${username} ${password}
+    sudo mysql -e "use vrserver;GRANT ALL PRIVILEGES ON vrserver.* to '$username'@'localhost'"
+    python3 "${git_dir}"/setup/update.py "${git_dir}"/src/main/resources/META-INF/persistence.xml "${username}" "${password}"
 fi
 
 read -r -p 'Restart database [y/N]?' restartDb
 if [[ "$restartDb" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    echo
     sudo /etc/init.d/mysql restart
 fi
 
 read -r -p 'Run the server now[y/N]?' runServer
 if [[ "$runServer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     if dpkg -s net-tools &>/dev/null; then
-        if  [[ `netstat -tlpn | grep 80 | grep java` ]] &>/dev/null; then
+        if  [[ $(netstat -tlpn | grep 80 | grep java) ]] &>/dev/null; then
             echo "Shut down server before executing this script"
             exit
         fi
@@ -70,9 +71,7 @@ if [[ "$runServer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
             echo "Port 80 free"
         fi
     fi
-    cd ${git_dir}
+    cd "${git_dir}" || exit
     nohup mvn jetty:run -Pproduction &
     echo
 fi
-
-
