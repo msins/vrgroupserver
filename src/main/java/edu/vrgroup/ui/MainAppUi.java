@@ -133,13 +133,11 @@ public class MainAppUi extends AppLayout implements GameChangeListener, Scenario
       return;
     }
     scenarioSelect.getSelect().setDataProvider(new ScenarioDataProvider(game));
-    System.out.println("[Main] New game:" + game);
     registerToScenarioNotifier(game);
   }
 
   @Override
   public void scenarioChanged(Scenario scenario) {
-    System.out.println("[Main] New scenario:" + scenario);
     scenarioSelect.setValue(scenario);
   }
 

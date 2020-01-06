@@ -102,7 +102,6 @@ public class QuestionsUi extends StylizedHorizontalLayout implements GameChangeL
   @Override
   public void gameChanged(Game game) {
     this.game = game;
-    System.out.println("[Questions] New game: " + game);
     registerToScenarioNotifier(game);
     questionList.getDataProvider().refreshAll();
     if (questionInformation != null) {
@@ -112,7 +111,6 @@ public class QuestionsUi extends StylizedHorizontalLayout implements GameChangeL
 
   @Override
   public void scenarioChanged(Scenario scenario) {
-    System.out.println("[Questions] New scenario: " + scenario);
     this.scenario = scenario;
     if (questionInformation != null) {
       questionInformation.removeAll();

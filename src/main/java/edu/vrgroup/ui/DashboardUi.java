@@ -30,7 +30,6 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener, S
   @Override
   public void gameChanged(Game game) {
     this.game = game;
-    System.out.println("[Dashboard] New game: " + game);
     if (game != null) {
       if (grid.getColumnByKey("game") != null) {
         grid.removeColumn(grid.getColumnByKey("game"));
@@ -47,7 +46,6 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener, S
   @Override
   public void scenarioChanged(Scenario scenario) {
     this.scenario = scenario;
-    System.out.println("[Dashboard] New scenario: " + scenario);
     if (scenario != null) {
       if (grid.getColumnByKey("scenario") != null) {
         grid.removeColumn(grid.getColumnByKey("scenario"));
