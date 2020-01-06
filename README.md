@@ -1,14 +1,15 @@
 ## VR-group server
-- App used for managing surveys for different games, scenarios and questions through webapp. Any additions, deletions or updates are instantly synced with database. Newest information about any game can be obtained through rest api.
+- App used for managing surveys for different games, scenarios and questions through webapp. Any additions, deletions or updates are instantly synced with database. Newest information about any game can be obtained through the rest api.
 - Made with Vaadin, Hibernate, Jersey. Some other libraries used are Gson, Guava, Log4j 2.
 
 ## Testing
 - Run `mvn jetty:run` within the vrgroupserver directory and open [http://localhost:8080](http://localhost:8080)
-
+(make sure to change the port from 80 to 8080 in pom.xml, line 242)
 ## Installation (for Ubuntu)
-> `git clone https://github.com/msins/vrgroupserver.git <dir>`
-
-> `bash <dir>/vrgroupserver/setup/setup.sh <dir>/vrgroupserver/`
+```
+git clone https://github.com/msins/vrgroupserver.git <dir>
+bash <dir>/vrgroupserver/setup/setup.sh <dir>/vrgroupserver/
+```
 
 ## Current rest API v1
 - returns JSON-formatted data.
@@ -30,11 +31,11 @@
           "choices": [
             {
               "id": 7,
-              "value": "Choice 1"
+              "value": "Choice text 1"
             },
             {
               "id": 8,
-              "value": "Choice 2"
+              "value": "Choice text 2"
             }
           ],
           "type": "MULTIPLE_CHOICE"
@@ -50,14 +51,52 @@
             {
               "id": 10,
               "value": "Choice text 2"
+            },
+            {
+              "id": 11,
+              "value": "Choice text 3"
             }
           ],
-          "type": "SCALING_QUESTION"
+          "type": "SCALING"
         }
       ]
     }
   ]
 }
 ```
-- `POST /v1/games/<game_name>`
+- `POST /v1/games/<game_name>` saves answer for given user (project required basic user information)
+- this could(should) have been implemented to receive json containing only ids and not other redundant information but it was easier for other groups in project to use this format
+```json
+{
+  "choice":{
+    "id":7,
+    "value":"Choice text 1"
+  },
+  "question":{
+    "choices":[
+      {
+        "id":7,
+        "value":"Choice text 1"
+      },
+      {
+        "id":8,
+        "value":"Choice text 2"
+      }
+    ],
+    "id":3,
+    "text":"Question text 1",
+    "type":"MULTIPLE_CHOICE"
+  },
+  "scenario":{
+    "id":2,
+    "name":"Default"
+  },
+  "user":{
+    "age":21,
+    "email":"email@domain.com",
+    "gender":"M",
+    "name":"name"
+  }
+}
+```
 
