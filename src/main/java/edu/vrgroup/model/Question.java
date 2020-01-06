@@ -67,9 +67,6 @@ public class Question implements Serializable, Comparable<Question> {
     this.choices = choices;
   }
 
-  /**
-   * Used to render answers in dashboard
-   */
   public List<Choice> getChoices() {
     return choices;
   }
@@ -86,7 +83,7 @@ public class Question implements Serializable, Comparable<Question> {
 
   public enum Type {
     MULTIPLE_CHOICE("Multiple choices"),
-    SCALING_QUESTION("Scaling question");
+    SCALING("Scaling question");
 
     @Column(name = "name")
     private String name;
