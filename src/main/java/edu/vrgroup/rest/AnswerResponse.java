@@ -6,23 +6,23 @@ import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.model.User;
 
-/**
- * Answer received.
- */
+import java.lang.reflect.Field;
+
 public class AnswerResponse {
 
-  public User user;
-  public Scenario scenario;
-  public Question question;
-  public Choice choice;
+    public User user;
+    public Scenario scenario;
+    public Question question;
+    public Choice choice;
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this)
-        .add("user", user)
-        .add("scenario", scenario)
-        .add("question", question)
-        .add("choice", choice)
-        .toString();
-  }
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("user", user)
+                .add("scenario", scenario)
+                .add("question", question)
+                .add("choice", choice)
+                .toString();
+    }
+
 }
