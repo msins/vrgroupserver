@@ -13,15 +13,21 @@ import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Scenario;
 import edu.vrgroup.ui.providers.DashboardGridAnswersProvider;
 import edu.vrgroup.ui.util.AnswersGrid;
+
 import java.time.format.DateTimeFormatter;
 
 @Route(value = "dashboard", layout = MainAppUi.class)
 @PageTitle("Dashboard")
-public class DashboardUi extends VerticalLayout implements GameChangeListener, ScenarioChangeListener {
+public class DashboardUi extends VerticalLayout implements GameChangeListener,
+    ScenarioChangeListener {
 
   DashboardGrid grid = new DashboardGrid();
   Game game;
   Scenario scenario;
+
+  {
+    setSizeFull();
+  }
 
   public DashboardUi() {
     add(grid);
@@ -34,11 +40,11 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener, S
       if (grid.getColumnByKey("game") != null) {
         grid.removeColumn(grid.getColumnByKey("game"));
       }
-    }else{
+    } else {
       grid.refreshAllColumns();
     }
 
-    grid.setDataProvider(new DashboardGridAnswersProvider(game, scenario));
+    grid.setDataProvider(new DashboardGridAnswersProvider(game));
     registerToScenarioNotifier(game);
     grid.getDataProvider().refreshAll();
   }
@@ -60,6 +66,10 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener, S
 
   @Override
   protected void onAttach(AttachEvent attachEvent) {
+    if(game == null && scenario == null){
+      grid.setDataProvider(new DashboardGridAnswersProvider());
+      grid.getDataProvider().refreshAll();
+    }
     registerToGameNotifier();
   }
 
@@ -70,6 +80,10 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener, S
   }
 
   private static class DashboardGrid extends AnswersGrid {
+
+    {
+      setSizeFull();
+    }
 
     public DashboardGrid() {
       initUi();

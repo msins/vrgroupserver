@@ -14,6 +14,9 @@ public class DashboardGridAnswersProvider extends AbstractBackEndDataProvider<An
   private Game game;
   private Scenario scenario;
 
+  public DashboardGridAnswersProvider() {
+  }
+
   public DashboardGridAnswersProvider(Game game) {
     this.game = game;
   }
