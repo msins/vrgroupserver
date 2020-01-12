@@ -1,6 +1,6 @@
 ## VR-group server
-- App used for managing surveys for different games, scenarios and questions through webapp. Any additions, deletions or updates are instantly synced with database. Newest information about any game can be obtained through the rest api.
-- Made with Vaadin, Hibernate, Jersey. Some other libraries used are Gson, Guava, Log4j 2.
+- Webapp used for managing surveys for different games, scenarios and questions through web interface. Any additions, deletions or updates are instantly synced with database. Newest information about any game can be obtained through the rest API.
+- Made with Vaadin, Hibernate, Jersey. Running on Jetty. Some other libraries used are Gson, Guava, Log4j 2.
 
 ## Testing
 - Run `mvn jetty:run` within the vrgroupserver directory and open [http://localhost:8080](http://localhost:8080)
@@ -64,7 +64,7 @@ bash <dir>/vrgroupserver/setup/setup.sh <dir>/vrgroupserver/
   ]
 }
 ```
-- `POST /v1/games/<game_name>` saves answer for given user (project required basic user information)
+- `POST /v1/games/<game_name>` saves answer for a given user (project required basic user information)
 - this could(should) have been implemented to receive json containing only ids and not other redundant information but it was easier for other groups in project to use this format
 ```json
 {

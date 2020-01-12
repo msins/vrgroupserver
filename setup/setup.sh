@@ -16,7 +16,7 @@ sudo apt-get update > /dev/null 2>&1
 echo "Downloading openjdk 11..."
 sudo apt-get install openjdk-11-jdk
 
-echo "Installing maven"
+echo "Installing maven..."
 sudo apt-get install maven
 
 if command -v python3 &>/dev/null; then
@@ -67,11 +67,10 @@ if [[ "$runServer" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         echo "If the server is running please shut it down before continuing with the execution of this script"
         read -r -p 'Force free the port [y/N]?' response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-            sudo fuser 80/tcp
+            sudo fuser 80/tcp -k
             echo "Port 80 free"
         fi
     fi
     cd "${git_dir}" || exit
     nohup mvn jetty:run -Pproduction &
-    echo
 fi
