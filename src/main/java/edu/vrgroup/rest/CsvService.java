@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,10 +54,10 @@ public class CsvService extends Application {
      */
     CsvHelper csv = new CsvHelper(game);
     java.nio.file.Path csvPath = Paths.get("csv", game.getName() + "_answers.csv");
-    csv.writeToFile(csvPath.toFile());
+    csv.writeToFile(csvPath);
     String csvStr;
     try {
-      csvStr = Files.readString(csvPath);
+      csvStr = Files.readString(csvPath, StandardCharsets.UTF_8);
     } catch (IOException e) {
       return Response.status(404).entity("Failed to generate csv.").build();
     }
@@ -72,13 +73,15 @@ public class CsvService extends Application {
       this.game = game;
     }
 
-    public void writeToFile(File file) {
+    public void writeToFile(java.nio.file.Path path) {
       int offset = 0;
       int limit = 5000;
 
       CSVWriter writer = null;
       try {
-        writer = new CSVWriter(new BufferedWriter(new FileWriter(file), '\t'));
+        BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+        bw.write('\ufeff');
+        writer = new CSVWriter(bw, '\t');
         writer.writeNext(header());
 
         AtomicInteger count = new AtomicInteger();
