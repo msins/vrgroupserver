@@ -18,14 +18,14 @@ create table Choice
         primary key,
     questionId int                      not null,
     orderValue int                      not null,
-    text       varchar(50) charset utf8 not null
+    text       varchar(200) charset utf8 not null
 );
 
 create table Scenario
 (
     id   int auto_increment
         primary key,
-    name varchar(50) not null
+    name varchar(200) not null
 );
 
 create table ScenarioQuestion
@@ -46,8 +46,8 @@ create table User
 (
     id     int auto_increment
         primary key,
-    name   varchar(50) not null,
-    email  varchar(50) null,
+    name   varchar(100) not null,
+    email  varchar(100) null,
     gender char        null,
     age    int         null
 );

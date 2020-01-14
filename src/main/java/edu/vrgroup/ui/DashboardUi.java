@@ -105,8 +105,8 @@ public class DashboardUi extends VerticalLayout implements GameChangeListener,
           .setHeader(new Html("<b>Time</b>"));
       addColumn(a -> a.getUser().getName())
           .setHeader(new Html("<b>User</b>"));
-      addColumn(Answer::getIPv4)
-          .setHeader(new Html("<b>IPv4</b>"));
+      addColumn(Answer::getIP)
+          .setHeader(new Html("<b>IP</b>"));
       addColumn(Answer::getGame)
           .setKey("game")
           .setHeader(new Html("<b>Game</b>"));

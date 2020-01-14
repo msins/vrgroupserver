@@ -21,7 +21,6 @@ import edu.vrgroup.model.Choice;
 import edu.vrgroup.model.Game;
 import edu.vrgroup.model.Question;
 import edu.vrgroup.model.Scenario;
-import edu.vrgroup.model.User;
 import edu.vrgroup.ui.forms.NewQuestionForm;
 import edu.vrgroup.ui.providers.AnswersGridDataProvider;
 import edu.vrgroup.ui.providers.QuestionsProvider;
@@ -31,8 +30,6 @@ import edu.vrgroup.ui.util.ResultChart;
 import edu.vrgroup.ui.util.StylizedHorizontalLayout;
 import edu.vrgroup.ui.util.StylizedList;
 import edu.vrgroup.ui.util.StylizedVerticalLayout;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -227,9 +224,9 @@ public class QuestionsUi extends StylizedHorizontalLayout implements GameChangeL
           .format(DateTimeFormatter.ofPattern("d.MM.yyyy. HH:mm:ss")))
           .setHeader(new Html("<b>Time</b>"));
       addColumn(
-          TemplateRenderer.<Answer>of("<div>[[item.user.name]]<b>[</b>[[item.IPv4]]<b>]</b></div>")
+          TemplateRenderer.<Answer>of("<div>[[item.user.name]]<b>[</b>[[item.IP]]<b>]</b></div>")
               .withProperty("user", Answer::getUser)
-              .withProperty("IPv4", Answer::getIPv4))
+              .withProperty("IP", Answer::getIP))
           .setHeader(new Html("<b>User</b>"));
       addColumn(Answer::getChoice)
           .setHeader(new Html("<b>Score</b>"));

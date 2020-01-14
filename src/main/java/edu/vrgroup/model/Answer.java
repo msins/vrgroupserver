@@ -54,20 +54,20 @@ public class Answer implements Serializable, Comparable<Answer> {
   private Choice choice;
 
   @Column
-  private String IPv4;
+  private String IP;
 
   public Answer() {
   }
 
   public Answer(Timestamp timestamp, Question question, Scenario scenario, Game game, User user, Choice choice,
-      String IPv4) {
+      String IP) {
     this.timestamp = timestamp;
     this.question = question;
     this.scenario = scenario;
     this.game = game;
     this.user = user;
     this.choice = choice;
-    this.IPv4 = IPv4;
+    this.IP = IP;
   }
 
   public Timestamp getTimestamp() {
@@ -118,12 +118,12 @@ public class Answer implements Serializable, Comparable<Answer> {
     this.choice = choice;
   }
 
-  public String getIPv4() {
-    return IPv4;
+  public String getIP() {
+    return IP;
   }
 
-  public void setIPv4(String IPv4) {
-    this.IPv4 = IPv4;
+  public void setIP(String IP) {
+    this.IP = IP;
   }
 
   @Override
@@ -134,7 +134,7 @@ public class Answer implements Serializable, Comparable<Answer> {
         .add("scenario", scenario)
         .add("game", game)
         .add("choice", choice)
-        .add("IPv4", IPv4)
+        .add("IPv4", IP)
         .toString();
   }
 
