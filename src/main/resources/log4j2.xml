@@ -7,9 +7,22 @@
       </PatternLayout>
     </File>
   </Appenders>
-<Loggers>
-  <Logger name="edu.vrgroup.rest.GamesService" level="INFO">
-    <AppenderRef ref="RestLogs"/>
-  </Logger>
-</Loggers>
+
+  <Appenders>
+    <File name="CsvLogs" fileName="csv/csv.log" append="true">
+      <PatternLayout>
+        <Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
+      </PatternLayout>
+    </File>
+  </Appenders>
+
+  <Loggers>
+    <Logger name="edu.vrgroup.rest.GamesService" level="INFO">
+      <AppenderRef ref="RestLogs"/>
+    </Logger>
+
+    <Logger name="edu.vrgroup.rest.CsvService" level="INFO">
+      <AppenderRef ref="CsvLogs"/>
+    </Logger>
+  </Loggers>
 </Configuration>
