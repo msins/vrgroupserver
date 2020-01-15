@@ -1,10 +1,10 @@
 ## VR-group server
 - Webapp used for managing surveys for different games, scenarios and questions through web interface. Any additions, deletions or updates are instantly synced with database. Newest information about any game can be obtained through the rest API.
-- Made with Vaadin, Hibernate, Jersey. Running on Jetty. Some other libraries used are Gson, Guava, Log4j 2.
+- Made with Vaadin, Hibernate, Jersey. Running on Jetty. Some other libraries used are OpenCSV, Gson, Guava, Log4j 2.
 
 ## Testing
 - Run `mvn jetty:run` within the vrgroupserver directory and open [http://localhost:8080](http://localhost:8080)
-(make sure to change the port from 80 to 8080 in pom.xml, line 242)
+(make sure to change the port, from 80 to 8080 in pom.xml line 248, or run with sudo on [http://localhost](http://localhost))
 ## Installation (for Ubuntu)
 ```
 git clone https://github.com/msins/vrgroupserver.git <dir>
@@ -99,4 +99,5 @@ bash <dir>/vrgroupserver/setup/setup.sh <dir>/vrgroupserver/
   }
 }
 ```
+- Csv can be fetched with `GET /v1/csv/<game_name>`
 

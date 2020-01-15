@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Path("/csv")
+@Path("/v1/csv")
 public class CsvService extends Application {
 
   private static final Logger logger = LogManager.getLogger(CsvService.class);
@@ -81,7 +81,7 @@ public class CsvService extends Application {
       try {
         BufferedWriter bw = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
         bw.write('\ufeff');
-        writer = new CSVWriter(bw, '\t');
+        writer = new CSVWriter(bw, ',');
         writer.writeNext(header());
 
         AtomicInteger count = new AtomicInteger();
