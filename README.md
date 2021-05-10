@@ -3,6 +3,10 @@
 - Made with Vaadin, Hibernate, Jersey. Running on Jetty. Some other libraries used are OpenCSV, Gson, Guava, Log4j 2.
 - Didn't use MVP since ui is pretty simple, probably should have
 
+## Pics
+![plot](./pics/image2.png?raw=true "function")
+![plot](./pics/image3.png?raw=true "function")
+![plot](./pics/image4.png?raw=true "function")
 ## Testing
 - Run `mvn jetty:run` within the vrgroupserver directory and open [http://localhost:8080](http://localhost:8080)
 (make sure to change the port, from 80 to 8080 in pom.xml line 248, or run with sudo on [http://localhost](http://localhost))
